@@ -1,0 +1,512 @@
+print(bio_agent_df)
+bio_agent_df %>%
+ggplot() +
+geom_col(aes(agent_col, count), fill = "#FFDB6D" )+
+theme_bw()+
+labs(y = "Frequency", x = "Biological control agent")+
+theme(axis.title.x=element_text(size=18,face="bold"),
+axis.title.y=element_text(size=18,face="bold"),
+axis.text.y = element_text(size = 14, color = "black", face = "italic"),
+axis.text.x = element_text(size = 14, color = "black"),
+legend.text = element_text(size = 16),
+legend.title = element_text(size = 18))+
+coord_flip()+
+ggsave("plots/agent_bar.png", units = "cm",
+width = 30, height = 20, dpi = 150)
+cropagent_df <- data.frame()
+for (i in 1:length(biological_control_agents)) {
+for (j in 1:length(crops)){
+agc_df = df_a %>%
+filter(str_detect(abs, as.character(biological_control_agents[i])) &
+str_detect(abs, as.character(crops[j])))
+Freq_agc_int <- agc_df %>%
+dplyr:: summarise(count_agent = n(),
+count_crop = n())
+agent = biological_control_agents[i]
+crop = crops[j]
+extract_agc <- data.frame(agent, crop, environment, Freq_agc_int)
+cropagent_df = cropagent_df %>%
+bind_rows(extract_agc)
+}}
+cropagent_df %>%
+group_by(crop) %>%
+dplyr:: summarise(count_crop = sum(count_crop))
+cropagent_df1 = cropagent_df %>%
+mutate(crop = case_when(crop == "soybeans" ~ "soybean",
+crop == "soyabean" ~ "soybean",
+crop == "soya bean" ~ "soybean",
+crop == "sunflowers" ~ "sunflower",
+crop == "oilseed rape" ~ "canola",
+crop == "dry beans" ~ "dry bean",
+crop == "blueberries" ~ "blueberry",
+crop == "carrots" ~ "carrot",
+crop == "potatoes" ~ "potato",
+crop == "green beans" ~ "green bean",
+crop == "cabbages" ~ "cabbage",
+crop == "peas" ~ "pea",
+crop == "tomatoes" ~ "tomato",
+crop == "groundnuts" ~ "groundnut",
+crop == "peanuts" ~ "peanut",
+crop == "peppers" ~ "pepper",
+crop == "cucumbers" ~ "cucumber",
+crop == "cowpeas" ~ "cowpea",
+crop == "pumpkins" ~ "pumpkin",
+crop == "lucerne" ~ "alfalfa",
+crop == "onions" ~ "onion",
+crop != "*" ~ crop)) %>%
+filter(crop %in% c("soybean", "sunflower", "canola"))
+cropagent_df1 %>%
+ggplot() +
+geom_col(aes(fill = crop, x = reorder(agent, -count_crop), y = count_crop), position = "stack")+
+theme_bw()+
+labs(y = "Number of articles", x = "Biological control agent")+
+scale_fill_manual(values = wes_palette("Moonrise1", n = 3), name = "Host crop")+
+theme(axis.title.x=element_text(size=18,face="bold"),
+axis.title.y=element_text(size=18,face="bold"),
+axis.text.y = element_text(size = 14, color = "black", face = "italic"),
+axis.text.x = element_text(size = 14, color = "black", face = "italic"),
+legend.text = element_text(size = 16),
+legend.title = element_text(size = 18))+
+coord_flip()+
+ggsave("plots/crop_agent_bar.png", units = "cm",
+width = 30, height = 20, dpi = 150)
+cropagent_df1 %>%
+group_by(agent) %>%
+summarise_at(vars(count_crop), funs(sum(., na.rm=TRUE)))
+# cropagent_df <- data.frame()
+#
+# for (i in 1:length(biological_control_agents)) {
+# for (j in 1:length(crops))
+# for (k in 1:length(envi)){
+#
+#   agc_df = df_a %>%
+#     filter(str_detect(abs, as.character(biological_control_agents[i])) &
+#            str_detect(abs, as.character(crops[j])) &
+#            str_detect(abs, as.character(envi[k])))
+#
+# Freq_agc_int <- agc_df %>%
+#       dplyr:: summarise(count_agent = n(),
+#                         count_crop = n(),
+#                         count_envi = n())
+#
+# agent = biological_control_agents[i]
+# crop = crops[j]
+# environment = envi[k]
+#
+#   extract_agc <- data.frame(agent, crop, environment, Freq_agc_int)
+#   cropagent_df = cropagent_df %>%
+#   bind_rows(extract_agc)
+# }}
+#
+#
+# cropagent_df %>%
+#   group_by(crop) %>%
+#    dplyr:: summarise(count_crop = sum(count_crop),
+#                      count_envi = sum(count_envi))
+#
+#
+# cropagent_df1 = cropagent_df %>%
+#     mutate(crop = case_when(crop == "soybeans" ~ "soybean",
+#                         crop == "soyabean" ~ "soybean",
+#                         crop == "soya bean" ~ "soybean",
+#                         crop == "sunflowers" ~ "sunflower",
+#                         crop == "oilseed rape" ~ "canola",
+#                         crop == "dry beans" ~ "dry bean",
+#                         crop == "blueberries" ~ "blueberry",
+#                         crop == "carrots" ~ "carrot",
+#                         crop == "potatoes" ~ "potato",
+#                         crop == "green beans" ~ "green bean",
+#                         crop == "cabbages" ~ "cabbage",
+#                         crop == "peas" ~ "pea",
+#                         crop == "tomatoes" ~ "tomato",
+#                         crop == "groundnuts" ~ "groundnut",
+#                         crop == "peanuts" ~ "peanut",
+#                         crop == "peppers" ~ "pepper",
+#                         crop == "cucumbers" ~ "cucumber",
+#                         crop == "cowpeas" ~ "cowpea",
+#                         crop == "pumpkins" ~ "pumpkin",
+#                         crop == "lucerne" ~ "alfalfa",
+#                          crop == "onions" ~ "onion",
+#                         crop != "*" ~ crop),
+#            environment = case_when(environment == "in vitro" ~ "laboratory",
+#                                environment == "in vivo" ~ "laboratory",
+#                                environment == "glasshouse" ~ "greenhouse",
+#                                environment != "*" ~ environment)) %>%
+#  filter(crop %in% c("soybean", "sunflower", "canola"))
+#
+#
+# cropagent_df1 %>%
+#   ggplot() +
+#   geom_col(aes(fill = crop, x = agent, y = count_crop), position = "stack")+
+#   theme_bw()+
+#   labs(y = "Frequency", x = "Biological control agent")+
+#  scale_fill_manual(values = wes_palette("Moonrise1", n = 3), name = "Host crop")+
+#  theme(axis.title.x=element_text(size=18,face="bold"),
+#        axis.title.y=element_text(size=18,face="bold"),
+#        axis.text.y = element_text(size = 14, color = "black", face = "italic"),
+#        axis.text.x = element_text(size = 14, color = "black", face = "italic"),
+#        legend.text = element_text(size = 16),
+#        legend.title = element_text(size = 18))+
+#   facet_wrap(~environment)+
+#   coord_flip()+
+#   ggsave("plots/crop_agent_bar.png", units = "cm",
+#             width = 30, height = 20, dpi = 150)
+envi <- c("laboratory", "in vitro", "greenhouse", "glasshouse", "field", "in vivo")
+enviagent_df <- data.frame()
+for (i in 1:length(biological_control_agents)) {
+for (j in 1:length(envi)) {
+age_en_df = df_a %>%
+filter(str_detect(abs, as.character(biological_control_agents[i])) &
+str_detect(abs, as.character(envi[j])))
+Freq_age_en <- age_en_df %>%
+dplyr::summarise(count_agent = n(),
+count_envi = n())
+agent = biological_control_agents[i]
+environ = envi[j]
+extract_age_en <- data.frame(agent, environ, Freq_age_en)
+enviagent_df = enviagent_df %>%
+bind_rows(extract_age_en)
+}}
+enviagent_df %>%
+group_by(environ) %>%
+dplyr::summarise(count_envi = sum(count_envi))
+enviagent_df1 = enviagent_df %>%
+mutate(environ = case_when(environ == "in vitro" ~ "laboratory",
+environ == "in vivo" ~ "laboratory",
+environ == "glasshouse" ~ "greenhouse",
+environ != "*" ~ environ))
+enviagent_df1 %>%
+ggplot() +
+geom_col(aes(fill = environ, x = reorder(agent, -count_envi), y = count_envi), position = "stack")+
+theme_bw()+
+labs(y = "Number of articles", x = "Biological control agent")+
+scale_fill_manual(values = wes_palette("Moonrise1", n = 3), name = "Environment")+
+theme(axis.title.x=element_text(size=18,face="bold"),
+axis.title.y=element_text(size=18,face="bold"),
+axis.text.y = element_text(size = 14, color = "black", face = "italic"),
+axis.text.x = element_text(size = 14, color = "black", face = "italic"),
+legend.text = element_text(size = 16),
+legend.title = element_text(size = 18))+
+coord_flip()+
+ggsave("plots/environment_agent_bar.png", units = "cm",
+width = 30, height = 20, dpi = 150)
+enviagent_df1 %>%
+group_by(agent) %>%
+summarise_at(vars(count_envi), funs(sum(., na.rm=TRUE)))
+common_name <- c("stem rot", "head rot", "white mold", "white mould", "stalk rot", "cotton rot", "blossom blight", "drop", "crown rot", "watery soft rot")
+common_name_df <- data.frame()
+for (i in 1:length(common_name)) {
+Freq_name = df_a %>%
+filter(str_detect(abs, as.character(common_name[i]))) %>%
+dplyr::summarise(count = n())
+common2 = common_name[i]
+extract_common <- data.frame(common2, Freq_name)
+common_name_df = common_name_df %>%
+bind_rows(extract_common)
+}
+common_name_df %>%
+mutate(common2 = case_when(common2 == "white mold" ~ "white mould",
+common2 != "*" ~ common2)) %>%
+ggplot() +
+geom_col(aes(common2, count), fill = "#FFDB6D" )+
+theme_bw()+
+labs(y = "Frequency", x = "Sclerotinia common name")+
+theme(axis.title.x=element_text(size=14,face="bold"),
+axis.title.y=element_text(size=14,face="bold"),
+axis.text.y = element_text(size = 10, color = "black"),
+axis.text.x = element_text(size = 10, color = "black", angle = 90))+
+coord_flip()+
+ggsave("plots/commonname_bar.png", units = "cm",
+width = 30, height = 20, dpi = 150)
+names(countries)
+interact_df <- data.frame()
+for (i in 1:length(countries)) {
+for (j in 1:length(crops)) {
+ia_df = df_a %>%
+filter(str_detect(abs, as.character(countries[i])) &
+str_detect(abs, as.character(crops[j])))
+Freq_int <- ia_df %>%
+dplyr::summarise(count_country = n(),
+count_crop = n())
+country = countries[i]
+crop = crops[j]
+extract_ia <- data.frame(country, crop, Freq_int)
+interact_df = interact_df %>%
+bind_rows(extract_ia)
+}}
+interact_df %>%
+group_by(crop) %>%
+dplyr::summarise(count_crop = sum(count_crop))
+interact_df1 = interact_df %>%
+mutate(crop = case_when(crop == "soybeans" ~ "soybean",
+crop == "soyabean" ~ "soybean",
+crop == "soya bean" ~ "soybean",
+crop == "sunflowers" ~ "sunflower",
+crop == "oilseed rape" ~ "canola",
+crop == "dry beans" ~ "dry bean",
+crop == "blueberries" ~ "blueberry",
+crop == "carrots" ~ "carrot",
+crop == "potatoes" ~ "potato",
+crop == "green beans" ~ "green bean",
+crop == "cabbages" ~ "cabbage",
+crop == "peas" ~ "pea",
+crop == "tomatoes" ~ "tomato",
+crop == "groundnuts" ~ "groundnut",
+crop == "peanuts" ~ "peanut",
+crop == "peppers" ~ "pepper",
+crop == "cucumbers" ~ "cucumber",
+crop == "cowpeas" ~ "cowpea",
+crop == "pumpkins" ~ "pumpkin",
+crop == "lucerne" ~ "alfalfa",
+crop == "onions" ~ "onion",
+crop != "*" ~ crop)) %>%
+filter(country %in% c("Argentina", "Australia", "Brazil", "Canada", "China", "India", "Italy", "Japan",
+"New Zealand", "United States", "South Africa"),
+crop %in% c("soybean", "sunflower", "canola", "pea", "potato", "tomato"))
+cbp1 <- c("#CCCCCC", "#E69F00", "#FFFF99", "#CC9900",
+"#F0E442", "#FFCC00", "#D55E00", "#FFFF66")
+interact_df1 %>%
+ggplot() +
+geom_col(aes(fill = crop, x = reorder(country, -count_crop), y = count_crop), position = "stack")+
+theme_bw()+
+labs(y = "Number of articles", x = "Country")+
+scale_fill_manual(values = cbp1, name = "Host crop")+
+theme(axis.title.x=element_text(size=18,face="bold"),
+axis.title.y=element_text(size=18,face="bold"),
+axis.text.y = element_text(size = 16, color = "black"),
+axis.text.x = element_text(size = 16, color = "black", angle = 90),
+legend.text = element_text(size = 16),
+legend.title = element_text(size = 18))+
+ggsave("plots/country_host_bar.png", units = "cm",
+width = 30, height = 20, dpi = 150)
+interact_df1 %>%
+group_by(country) %>%
+summarise_at(vars(count_crop), funs(sum(., na.rm=TRUE)))
+interact_df1 %>%
+group_by(crop) %>%
+summarise_at(vars(count_crop), funs(sum(., na.rm=TRUE)))
+set.seed(1234)    #reproducibility of the modeling
+png("wordcloud.png", width=400,height=400)
+wordcloud(freq$auth_key,
+freq$n,
+scale = c(2, 0.8),
+max.words = 200,
+random.order = FALSE,
+rot.per = 0.35,
+colors=brewer.pal(8, "Dark2"))
+while (!is.null(dev.list()))
+dev.off()
+describe(freq$n)
+crop_df %>%
+mutate(crop = case_when(crops2 == "soybeans" ~ "soybean",
+crops2 == "soyabean" ~ "soybean",
+crops2 == "soya bean" ~ "soybean",
+crops2 == "oilseed rape" ~ "canola",
+crops2 == "rapeseed" ~ "canola",
+crops2 == "sunflowers" ~ "sunflower",
+crops2 == "dry beans" ~ "dry bean",
+crops2 == "blueberries" ~ "blueberry",
+crops2 == "carrots" ~ "carrot",
+crops2 == "potatoes" ~ "potato",
+crops2 == "green beans" ~ "common bean",
+crops2 == "green bean" ~ "common bean",
+crops2 == "cabbages" ~ "cabbage",
+crops2 == "peas" ~ "pea",
+crops2 == "tomatoes" ~ "tomato",
+crops2 == "groundnuts" ~ "groundnut",
+crops2 == "peanuts" ~ "peanut",
+crops2 == "peppers" ~ "pepper",
+crops2 == "cucumbers" ~ "cucumber",
+crops2 == "cowpeas" ~ "cowpea",
+crops2 == "pumpkins" ~ "pumpkin",
+crops2 == "lucerne" ~ "alfalfa",
+crops2 == "onions" ~ "onion",
+crops2 != "*" ~ crops2)) %>%
+ggplot() +
+geom_col(aes(crop, count))+
+scale_fill_manual(values = wes_palette("Moonrise1", n = 3))+
+theme_bw()+
+labs(y = "Frequency", x = "Sclerotinia host crop")+
+theme(axis.title.x=element_text(size=18,face="bold"),
+axis.title.y=element_text(size=18,face="bold"),
+axis.text.y = element_text(size = 14, color = "black"),
+axis.text.x = element_text(size = 14, color = "black", angle = 90))+
+ggsave("plots/crops_bar.png", units = "cm",
+width = 30, height = 20, dpi = 150)
+crop_df %>%
+mutate(crop = case_when(crops2 == "soybeans" ~ "soybean",
+crops2 == "soyabean" ~ "soybean",
+crops2 == "soya bean" ~ "soybean",
+crops2 == "oilseed rape" ~ "canola",
+crops2 == "rapeseed" ~ "canola",
+crops2 == "sunflowers" ~ "sunflower",
+crops2 == "dry beans" ~ "dry bean",
+crops2 == "blueberries" ~ "blueberry",
+crops2 == "carrots" ~ "carrot",
+crops2 == "potatoes" ~ "potato",
+crops2 == "green beans" ~ "common bean",
+crops2 == "green bean" ~ "common bean",
+crops2 == "cabbages" ~ "cabbage",
+crops2 == "peas" ~ "pea",
+crops2 == "tomatoes" ~ "tomato",
+crops2 == "groundnuts" ~ "groundnut",
+crops2 == "peanuts" ~ "peanut",
+crops2 == "peppers" ~ "pepper",
+crops2 == "cucumbers" ~ "cucumber",
+crops2 == "cowpeas" ~ "cowpea",
+crops2 == "pumpkins" ~ "pumpkin",
+crops2 == "lucerne" ~ "alfalfa",
+crops2 == "onions" ~ "onion",
+crops2 != "*" ~ crops2)) %>%
+ggplot() +
+geom_col(aes(crop, count) fill = "#F0E442")+
+crop_df %>%
+mutate(crop = case_when(crops2 == "soybeans" ~ "soybean",
+crops2 == "soyabean" ~ "soybean",
+crops2 == "soya bean" ~ "soybean",
+crops2 == "oilseed rape" ~ "canola",
+crops2 == "rapeseed" ~ "canola",
+crops2 == "sunflowers" ~ "sunflower",
+crops2 == "dry beans" ~ "dry bean",
+crops2 == "blueberries" ~ "blueberry",
+crops2 == "carrots" ~ "carrot",
+crops2 == "potatoes" ~ "potato",
+crops2 == "green beans" ~ "common bean",
+crops2 == "green bean" ~ "common bean",
+crops2 == "cabbages" ~ "cabbage",
+crops2 == "peas" ~ "pea",
+crops2 == "tomatoes" ~ "tomato",
+crops2 == "groundnuts" ~ "groundnut",
+crops2 == "peanuts" ~ "peanut",
+crops2 == "peppers" ~ "pepper",
+crops2 == "cucumbers" ~ "cucumber",
+crops2 == "cowpeas" ~ "cowpea",
+crops2 == "pumpkins" ~ "pumpkin",
+crops2 == "lucerne" ~ "alfalfa",
+crops2 == "onions" ~ "onion",
+crops2 != "*" ~ crops2)) %>%
+ggplot() +
+geom_col(aes(crop, count) fill = "#F0E442"))+
+crop_df %>%
+mutate(crop = case_when(crops2 == "soybeans" ~ "soybean",
+crops2 == "soyabean" ~ "soybean",
+crops2 == "soya bean" ~ "soybean",
+crops2 == "oilseed rape" ~ "canola",
+crops2 == "rapeseed" ~ "canola",
+crops2 == "sunflowers" ~ "sunflower",
+crops2 == "dry beans" ~ "dry bean",
+crops2 == "blueberries" ~ "blueberry",
+crops2 == "carrots" ~ "carrot",
+crops2 == "potatoes" ~ "potato",
+crops2 == "green beans" ~ "common bean",
+crops2 == "green bean" ~ "common bean",
+crops2 == "cabbages" ~ "cabbage",
+crops2 == "peas" ~ "pea",
+crops2 == "tomatoes" ~ "tomato",
+crops2 == "groundnuts" ~ "groundnut",
+crops2 == "peanuts" ~ "peanut",
+crops2 == "peppers" ~ "pepper",
+crops2 == "cucumbers" ~ "cucumber",
+crops2 == "cowpeas" ~ "cowpea",
+crops2 == "pumpkins" ~ "pumpkin",
+crops2 == "lucerne" ~ "alfalfa",
+crops2 == "onions" ~ "onion",
+crops2 != "*" ~ crops2)) %>%
+ggplot() +
+geom_col(aes(crop, count), fill = "#F0E442"))+
+crop_df %>%
+mutate(crop = case_when(crops2 == "soybeans" ~ "soybean",
+crops2 == "soyabean" ~ "soybean",
+crops2 == "soya bean" ~ "soybean",
+crops2 == "oilseed rape" ~ "canola",
+crops2 == "rapeseed" ~ "canola",
+crops2 == "sunflowers" ~ "sunflower",
+crops2 == "dry beans" ~ "dry bean",
+crops2 == "blueberries" ~ "blueberry",
+crops2 == "carrots" ~ "carrot",
+crops2 == "potatoes" ~ "potato",
+crops2 == "green beans" ~ "common bean",
+crops2 == "green bean" ~ "common bean",
+crops2 == "cabbages" ~ "cabbage",
+crops2 == "peas" ~ "pea",
+crops2 == "tomatoes" ~ "tomato",
+crops2 == "groundnuts" ~ "groundnut",
+crops2 == "peanuts" ~ "peanut",
+crops2 == "peppers" ~ "pepper",
+crops2 == "cucumbers" ~ "cucumber",
+crops2 == "cowpeas" ~ "cowpea",
+crops2 == "pumpkins" ~ "pumpkin",
+crops2 == "lucerne" ~ "alfalfa",
+crops2 == "onions" ~ "onion",
+crops2 != "*" ~ crops2)) %>%
+ggplot() +
+geom_col(aes(crop, count), fill = "#F0E442")+
+theme_bw()+
+labs(y = "Frequency", x = "Sclerotinia host crop")+
+theme(axis.title.x=element_text(size=18,face="bold"),
+axis.title.y=element_text(size=18,face="bold"),
+axis.text.y = element_text(size = 14, color = "black"),
+axis.text.x = element_text(size = 14, color = "black", angle = 90))+
+ggsave("plots/crops_bar.png", units = "cm",
+width = 30, height = 20, dpi = 150)
+common_name_df %>%
+mutate(common2 = case_when(common2 == "white mold" ~ "white mould",
+common2 != "*" ~ common2)) %>%
+ggplot() +
+geom_col(aes(common2, count), fill = "#F0E442" )+
+theme_bw()+
+labs(y = "Frequency", x = "Sclerotinia common name")+
+theme(axis.title.x=element_text(size=18,face="bold"),
+axis.title.y=element_text(size=18,face="bold"),
+axis.text.y = element_text(size = 14, color = "black"),
+axis.text.x = element_text(size = 14, color = "black", angle = 90))+
+coord_flip()+
+ggsave("plots/commonname_bar.png", units = "cm",
+width = 30, height = 20, dpi = 150)
+common_name_df %>%
+mutate(common2 = case_when(common2 == "white mold" ~ "white mould",
+common2 != "*" ~ common2)) %>%
+ggplot() +
+geom_col(aes(common2, count), fill = "#F0E442" )+
+theme_bw()+
+labs(y = "Frequency", x = "Sclerotinia common name")+
+theme(axis.title.x=element_text(size=18,face="bold"),
+axis.title.y=element_text(size=18,face="bold"),
+axis.text.y = element_text(size = 14, color = "black"),
+axis.text.x = element_text(size = 14, color = "black"))+
+coord_flip()+
+ggsave("plots/commonname_bar.png", units = "cm",
+width = 30, height = 20, dpi = 150)
+library(openxlsx)
+library(readr)
+library(tidytext)
+library(tidyr)
+library(tidyverse)
+library(ggthemes)
+library(ggplot2)
+library(rvest)
+library(xml2)
+library(dplyr)
+library(plyr)
+library(data.table)           #columns in dataframe te split en weer in df te sit
+library(wordcloud)
+library(RColorBrewer)         #wordcloud colour
+library(webshot)              #save wordcloud
+library(htmlwidgets)          #save wordcloud
+library(htmlTable)
+library(Hmisc)                #describe
+library(cld3)                 #detect and translate
+library(stringr)              #sentence case, split en ruil om initials and surname
+library(rnaturalearthdata)    #map
+library(rnaturalearth)        #map
+library(sp)                   #map
+library(sf)                   #map
+library(rgeos)                #map
+library(viridis)              #map
+library(viridisLite)          #map
+library(flextable)            #na table omsit
+library(officer)              #export flextable
+library(wesanderson)          #colours for ggplot
+actives_df
+actives_df
+View(df_a)

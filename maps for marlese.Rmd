@@ -1,0 +1,76 @@
+---
+title: "maps"
+author: "LAR"
+date: "04/12/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# library
+
+```{r}
+library(rnaturalearth)
+library(sp)
+```
+
+# article data import 
+
+```{r}
+#import your article data here
+article_df 
+```
+
+
+# shape file import
+```{r}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+world #see how different this looks to how we are use to normally
+
+#what is the class of this data?
+class(world)
+
+#checking if the map data works
+world %>% 
+  ggplot()+
+  geom_sf()
+```
+
+# joining data
+Now you need to join your own data with the map data. Now keep in mind your data is in the class of a dataframe but the world data are in the class of a sf data frame. 
+
+In order to get your data and the world data to align you need to use the full_join()
+
+article_df = data frame with the countries and the count, your column names for the countries need to be the same for the join to work. 
+
+
+```{r}
+as.data.frame(world) # use can now use this to navigate to what the data from uses as the country name...
+#it seems like "name" with a small letter is used. 
+
+article_df <- article_df %>% 
+  rename(Name ~ name) #if your name column is in capitals
+
+world.df = article_df %>% 
+  full_join(world) 
+
+class(world.df)
+
+# layered_map
+world.df = st_as_sf(world.df) ## Convert the spatial file to sf
+
+class(world.df)
+#can you see the difference between the two classes of world.df?
+```
+
+# mapping 
+```{r}
+ggplot(data = world.df) + #this is your new shape file
+    geom_sf(aes(fill = count)) + #this will make the colours of the count change
+    scale_fill_viridis_c(option = "plasma") #this selects the type of colours to include 
+```
+
