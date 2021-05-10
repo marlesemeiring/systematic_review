@@ -45,6 +45,8 @@ library(flextable)            #na table omsit
 library(officer)              #export flextable
 
 library(wesanderson)          #colours for ggplot
+
+library(forcats)              #reorder in ggplot
 ```
 
 
@@ -234,9 +236,11 @@ Gee net die eerste 10 rye
 
 #import and merge csv files
 
-setwd("C:/Users/MarleseBester/Desktop/lit_rev/Scopus_12Jan")
+setwd("C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Scopus_12Jan")
 scopus_raw2 <- ldply(list.files(), read.csv, header=TRUE)
-write.csv(scopus_raw2, "C:/Users/MarleseBester/Desktop/lit_rev/Sys_lit_rev/data/scopus_raw2.csv")
+write.csv(scopus_raw2, "C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\data\\scopus_raw2.csv")
+
+
 
 
 #import different sheets van Web of Science en ScienceDirect
@@ -244,9 +248,9 @@ write.csv(scopus_raw2, "C:/Users/MarleseBester/Desktop/lit_rev/Sys_lit_rev/data/
 # scopus_raw = read.xlsx("C:\\Users\\MarleseBester\\Desktop\\lit_rev\\scle_search_1_saam.xlsx", "Scopus - raw")
 # scholar_raw = read.xlsx("C:\\Users\\MarleseBester\\Desktop\\lit_rev\\scle_search_1_saam.xlsx", "GoogleScholar")
 
-science_raw = read.xlsx("C:\\Users\\MarleseBester\\Desktop\\lit_rev\\Science_direct\\ScienceDirect2.xlsx", "ScienceDirect1")
+science_raw = read.xlsx("C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Science_direct\\ScienceDirect2.xlsx", "ScienceDirect1")
 
-web_raw = read.xlsx("C:\\Users\\MarleseBester\\Desktop\\lit_rev\\scle_search_1_saam.xlsx", "Web of Science - raw")
+web_raw = read.xlsx("C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\scle_search_1_saam.xlsx", "Web of Science - raw")
 
 # scopus_raw3 = read.xlsx("C:\\Users\\MarleseBester\\Desktop\\lit_rev\\Sys_lit_rev\\data\\scopus_raw3.xlsx", "scopus_raw3")
 
@@ -348,7 +352,7 @@ df <- df12 %>%
 
 df$authors <- gsub("[[:punct:][:blank:]]+", " ", df$authors)
 
-write.csv(df, "C:/Users/MarleseBester/Desktop/lit_rev/Sys_lit_rev/data/litrev.csv")
+write.csv(df, "C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\data\\litrev.csv")
 
 df[!duplicated(df[,c("source_main")]),]
 df[!duplicated(df[,c("keyword")]),]
@@ -420,17 +424,17 @@ ca - Catalan
 # 
 #  gl_translate_detect()
 
-df$language <- 
-  cld3::detect_language(df$title)
-
-describe(df$language)
-
-languages <- df %>% 
-   dplyr:: count(language, sort = TRUE) %>%       
-    mutate(language = reorder(language, n)) %>% 
-  head(20)
-
-languages <- languages[!is.na(languages$language), ]
+# df$language <- 
+#   cld3::detect_language(df$title)
+# 
+# describe(df$language)
+# 
+# languages <- df %>% 
+#    dplyr:: count(language, sort = TRUE) %>%       
+#     mutate(language = reorder(language, n)) %>% 
+#   head(20)
+# 
+# languages <- languages[!is.na(languages$language), ]
 
 
 ```
@@ -464,24 +468,22 @@ ca - Catalan
 
 as.numeric(sub("[.]$", "", df$title))
 
-df$title2 <- str_to_title(df$title)
-
 df_a <- df %>%
- distinct(title2, .keep_all = TRUE) %>% 
- filter(type %in% c("Article", "article", "Article; Proceedings Paper Book", "Article; Early Access"),
-         !str_detect(title2, "^A Review"),
-         !str_detect(title2, "^a review"),
-         !str_detect(title2, "^Literature review"),
-         !str_detect(title2, "^A review"),
-         !str_detect(title2, "^Review of"),
+ distinct(abstract, .keep_all = TRUE) %>% 
+  distinct(title, .keep_all = TRUE) %>% 
+  filter(type %in% c("Article", "article", "Article; Proceedings Paper Book", "Article; Early Access"),
+         !str_detect(title, "^A Review"),
+         !str_detect(title, "^a review"),
+         !str_detect(title, "^Literature review"),
+         !str_detect(title, "^A review"),
+         !str_detect(title, "^Review of"),
          !str_detect(type, "^Review"),
-        year %in% 1920:2020) %>% 
-  filter(language == "en") %>% 
-  mutate(abs = case_when(abstract == "[No abstract available]" ~ NA_character_,
-                         abstract != "[No abstract available]" ~ abstract),
-         title3 = case_when(title2 == "[No title available]" ~ NA_character_, 
-                            title2 != "[No title available]" ~ title),
-         authors2 = case_when(authors == "[No author name available]" ~ NA_character_,
+         str_detect(abstract, "Sclerotinia sclerotiorum|Whetzelinia sclerotiorum")) %>%
+mutate(abs = case_when(abstract == "[No Abstract Available]" ~ NA_character_,
+                         abstract != "[No Abstract Available]" ~ abstract),
+         title3 = case_when(title == "[No Title Available]" ~ NA_character_, 
+                            title != "[No Title Available]" ~ title),
+         authors2 = case_when(authors == "[No Author Name Available]" ~ NA_character_,
                               authors != "[No author name available]" ~ authors),
          authors2 = case_when(authors == "[Anonymous]" ~ NA_character_,
                               authors != "[Anonymous]" ~ authors), 
@@ -489,18 +491,19 @@ df_a <- df %>%
                               authors != "[ANONYMOUS]" ~ authors),
          authors2 = case_when(authors == "ANONYMOUS" ~ NA_character_,
                               authors != "ANONYMOUS" ~ authors),
-         authors2 = case_when(authors == "No author name available" ~ NA_character_,
-                              authors != "No author name available" ~ authors))
+         authors2 = case_when(authors == "No Author Name Available" ~ NA_character_,
+                              authors != "No Author Name Available" ~ authors))
 
-df_a <- df_a[!is.na(df_a$cited), ]  #326
+df_a <- df_a[!is.na(df_a$cited), ]  #
 
-df_a <- df_a[!is.na(df_a$title3), ] #0
+df_a <- df_a[!is.na(df_a$title3), ] #
 
-df_a <- df_a[!is.na(df_a$abs), ]  #190
+df_a <- df_a[!is.na(df_a$abs), ]  #
 
-df_a <- within(df_a, rm(abstract, title, authors, title2))
+
+df_a <- within(df_a, rm(title, authors, abstract))
     
-write.csv(df_a, "C:/Users/MarleseBester/Desktop/lit_rev/Sys_lit_rev/data/litrev_df_a.csv")
+write.csv(df_a, "C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\data\\litrev_df_a.csv")
 
 
 
@@ -632,7 +635,7 @@ PROBLEEM - Die name wat italics moet wees is nie almal italics op die grafiek ni
 #         axis.text.x = element_text(angle = 90, size=10))+
 #   scale_x_continuous(breaks = seq(0, 90000, 1000))+
 #   ggsave("plots/keyword_search_bar.png", units = "cm", 
-#             width = 30, height = 20, dpi = 150)
+#             width = 30, height = 20, dpi = 300)
 # 
 # 
 # 
@@ -652,7 +655,7 @@ PROBLEEM - Die name wat italics moet wees is nie almal italics op die grafiek ni
 # #                                    face = ifelse(levels(df_b$format) == "no", "plain","italic")),
 # #         axis.text.x = element_text(angle = 90, size=10))+
 # #   ggsave("plots/keyword_year_1_bar.png", units = "cm", 
-# #             width = 50, height = 30, dpi = 150)
+# #             width = 50, height = 30, dpi = 300)
 # 
 # df_b %>% 
 #   filter(year > 1945) %>% 
@@ -668,7 +671,7 @@ PROBLEEM - Die name wat italics moet wees is nie almal italics op die grafiek ni
 #                                    face = ifelse(levels(df_b$format) == "no", "plain","italic")),
 #         axis.text.x = element_text(angle = 90, size=10))+
 #   ggsave("plots/keyword_year_2_bar.png", units = "cm", 
-#             width = 30, height = 20, dpi = 150)
+#             width = 30, height = 20, dpi = 300)
 # 
 # # #save tabel werk nie. Kry error
 # # 
@@ -706,7 +709,7 @@ df_a %>%
         axis.text.y = element_text(size = 10, color = "black"),
         axis.text.x = element_text(size = 10, color = "black", angle = 90))+ 
   ggsave("plots/years_1_bar.png", units = "cm", 
-            width = 30, height = 20, dpi = 150)
+            width = 30, height = 20, dpi = 300)
 
 
 ```
@@ -758,6 +761,7 @@ dplyr::summarise(total_citation = sum(cited)) %>%
   ggplot() + 
   geom_col(aes(x = reorder(authors2, -total_citation), y = total_citation), fill = "#F0E442")+
   geom_text(aes(authors2, total_citation, label = articles_written), hjust = -0.5)+
+  scale_y_continuous(limits = c(0, 1500), breaks = seq(0, 1500, by = 100))+
   coord_flip()+
  theme_bw()+
   labs(y = "Number of times cited", x = "Authors")+
@@ -767,7 +771,7 @@ dplyr::summarise(total_citation = sum(cited)) %>%
        axis.text.y = element_text(size = 14, color = "black"),
        axis.text.x = element_text(size = 14, color = "black"))+
   ggsave("plots/authors_cited_bar.png", units = "cm", 
-            width = 30, height = 20, dpi = 150)
+            width = 30, height = 20, dpi = 300)
 
 
  
@@ -851,7 +855,7 @@ ggplot() +
        axis.text.y = element_text(size = 14, color = "black"),
        axis.text.x = element_text(size = 14, color = "black"))+
   ggsave("plots/authors_written_bar.png", units = "cm", 
-            width = 30, height = 20, dpi = 150)
+            width = 30, height = 30, dpi = 300)
 
 
 df_a %>% 
@@ -891,7 +895,7 @@ df_a %>%
        axis.text.y = element_text(size = 10, color = "black"),
        axis.text.x = element_text(size = 10, color = "black"))+
   ggsave("plots/source_bar.png", units = "cm", 
-            width = 30, height = 20, dpi = 150)
+            width = 30, height = 20, dpi = 300)
 
 
 
@@ -937,7 +941,7 @@ freq %>%
        axis.text.x = element_text(size = 10, color = "black"))+
   labs(y = "Frequency", x = "Author keywords")+
   ggsave("plots/freq_auth_bar.png", units = "cm", 
-            width = 30, height = 20, dpi = 150)
+            width = 30, height = 20, dpi = 300)
 
 
 
@@ -967,7 +971,7 @@ freq %>%
 #   
 # }
 
-map <- read.csv("C:/Users/MarleseBester/Desktop/lit_rev/Sys_lit_rev/data/country_list.csv") %>%
+map <- read.csv("C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\data\\country_list.csv") %>%
        select(-"Code") %>% 
   mutate(name = case_when(Name == "Russian Federation" ~ "Russia",
                         Name != "*" ~ Name)) 
@@ -1007,7 +1011,7 @@ mapping %>%
        axis.text.x = element_text(size = 10, color = "black"))+
   coord_flip()+
   ggsave("plots/country_bar.png", units = "cm", 
-            width = 30, height = 20, dpi = 150)
+            width = 30, height = 20, dpi = 300)
 
 mapping %>%
    arrange(desc(count)) %>% 
@@ -1055,14 +1059,14 @@ class(world.df)
 
 ggplot(data = world.df) + 
     geom_sf(aes(fill = count)) + 
-    scale_fill_fermenter(palette = "YlOrRd", breaks = c(5, 10, 25, 35, 50, 80), name = "Articles per Country")+
+    scale_fill_fermenter(palette = "YlOrRd", breaks = c(5, 20, 40, 60, 80, 110, 130), name = "Articles per Country")+
     theme_bw()+
     theme(legend.text = element_text(size = 28),
           legend.title = element_text(size = 30))+
     theme(legend.key = element_rect(fill = "white"), 
                  legend.key.size = unit(2, "cm"))+
   ggsave("plots/map1.png", units = "cm", 
-            width = 80, height = 50, dpi = 150)
+            width = 80, height = 50, dpi = 600)
 
 ```
 
@@ -1082,7 +1086,7 @@ Elimination -
 
 # all
 
-manage <- c("fungicide", "chemical control", "biological control", "crop rotation", "sowing date", "planting date", "date of planting", "soil solarization", "soil solarisation", "partial resistance", "percentage of sclerotia in seed", "certified seed", "remove infected stubble", "burning of stubble", "weed control", "site selection", "selection of locality", "selection of location", "location selection", "cultural control", "cultivar selection", "biocontrol", "seed treatment", "genotype selection", "resistance breeding", "tillage", "no till", "cultural practices", "planting density", "row width", "forecast", "forecasting", "early warning", "biopesticide", "mycoparasite", "cover crop", "fumigation", "antagonist", "resistant cultivars", "no-tillage", "no tillage", "ploughing", "plant population", "nutrition", "disease prediction", "disease modeling", "soil pH", "sanitation", "heat treatment", "induced resistance", "reduced tillage", "row spacing", "host resistance", "prediction models", "plant density", "manure", "environment selection", "selection of the environment", "clean seed", "International Seed Testing Association", "ISTA")
+manage <- c("fungicide", "chemical control", "biological control", "crop rotation", "sowing date", "planting date", "date of planting", "soil solarization", "soil solarisation", "partial resistance", "percentage of sclerotia in seed", "certified seed", "remove infected stubble", "burning of stubble", "weed control", "site selection", "selection of locality", "selection of location", "location selection", "cultural control", "cultivar selection", "biocontrol", "seed treatment", "genotype selection", "resistance breeding", "tillage", "no till", "cultural practices", "planting density", "row width", "forecast", "forecasting", "early warning", "biopesticide", "mycoparasite", "cover crop", "fumigation", "antagonist", "resistant cultivars", "no-tillage", "no tillage", "ploughing", "plant population", "nutrition", "disease prediction", "disease modelling", "soil pH", "sanitation", "heat treatment", "induced resistance", "reduced tillage", "row spacing", "host resistance", "prediction models", "plant density", "manure", "environment selection", "selection of the environment", "clean seed", "International Seed Testing Association", "ISTA")
 
 managing <- data.frame()
 
@@ -1126,7 +1130,7 @@ manage <- managing %>%
                                   manage_prac == "forecasting" ~ "prediction models",
                                   manage_prac == "early warning" ~ "prediction models",
                                   manage_prac == "disease prediction" ~ "prediction models",
-                                  manage_prac == "disease modeling" ~ "prediction models",
+                                  manage_prac == "disease modelling" ~ "prediction models",
                                   manage_prac == "row spacing" ~ "row width",
                                   manage_prac == "host resistance" ~ "resistance breeding",
                                   manage_prac == "forecast" ~ "prediction models",
@@ -1146,7 +1150,7 @@ manage %>%
        axis.text.y = element_text(size = 10, color = "black"),
        axis.text.x = element_text(size = 10, color = "black", angle = 90))+
   ggsave("plots/manage_bar.png", units = "cm", 
-            width = 50, height = 30, dpi = 150)
+            width = 50, height = 30, dpi = 300)
 
 # groups
 
@@ -1189,7 +1193,7 @@ manage %>%
        axis.text.y = element_text(size = 10, color = "black"),
        axis.text.x = element_text(size = 10, color = "black", angle = 90))+
   ggsave("plots/manage_bar_6.png", units = "cm", 
-            width = 30, height = 20, dpi = 150)
+            width = 30, height = 20, dpi = 300)
 
 manage_tabe <- flextable(manage %>% 
   mutate(manage_prac2 = case_when(manage_prac1 =="planting date" ~ "Avoidance",
@@ -1231,6 +1235,43 @@ read_docx() %>%
   body_add_flextable(value = manage_tabe) %>% 
   print(target = "plots/manage_table.docx")
 
+man <- manage %>% 
+  mutate(manage_prac2 = case_when(manage_prac1 =="planting date" ~ "Avoidance",
+                                  manage_prac1 == "soil solarisation" ~ "Eradication",
+                                 manage_prac1 == "planting date" ~ "Avoidance",
+                                 manage_prac1 == "certified seed" ~ "Exclusion", 
+                                 manage_prac1 == "location selection" ~ "Avoidance",
+                                 manage_prac1 == "fungicide" ~ "Protection",
+                                 manage_prac1 == "crop rotation" ~ "Eradication", 
+                                 manage_prac1 == "biological control" ~ "Eradication",
+                                 manage_prac1 == "resistance breeding"  ~ "Resistance",
+                                 manage_prac1 == "remove infected stubble" ~ "Eradication",
+                                 manage_prac1 == "burning of stubble" ~ "Eradication",
+                                 manage_prac1 == "weed control" ~ "Eradication",
+                                 manage_prac1 == "no tillage" ~ "Protection", 
+                                 manage_prac1 == "tillage" ~ "Protection",
+                                 manage_prac1 == "reduced tillage" ~ "Protection",
+                                 manage_prac1 == "seed treatment" ~ "Exclusion",
+                                 manage_prac1 == "plant population" ~ "Avoidance",
+                                 manage_prac1 == "nutrition" ~ "Protection",
+                                 manage_prac1 == "fumigation" ~ "Protection",
+                                 manage_prac1 == "row width" ~ "Avoidance",
+                                 manage_prac1 == "cultural practices" ~ "Avoidance",
+                                 manage_prac1 == "sanitation" ~ "Exclusion",
+                                 manage_prac1 == "heat treatment" ~ "Eradication",
+                                 manage_prac1 == "soil pH" ~ "Protection",
+                                 manage_prac1 == "prediction models" ~ "Disease forecast",
+                                 manage_prac1 == "induced resistance" ~ "Resistance",
+                                 manage_prac1 == "cover crop" ~ "Avoidance",
+                                 manage_prac1 == "manure" ~ "Exclusion",
+                                  manage_prac1 != "*" ~ manage_prac1)) %>% 
+  group_by(manage_prac2, manage_prac1) %>% 
+  dplyr::summarize(frequency = sum(count))
+
+man %>%
+  group_by(manage_prac2) %>%
+  summarise_at(vars(frequency), funs(sum(., na.rm=TRUE))) 
+
   
 
 ```
@@ -1241,7 +1282,7 @@ meervoude insit
 
 ```{r}
 
-crops <- c("soybean", "soybeans", "sunflowers", "sunflower", "canola", "lettuce", "dry bean","dry beans", "blueberry", "blueberries", "carrot", "carrots", "potato", "potatoes", "green beans", "green bean", "cabbage", "cabbages", "oilseed rape", "broccoli", "cauliflower", "pea", "peas", "tomato", "tomatoes", "lucerne", "alfalfa", "groundnut", "groundnuts", "peanut", "peanuts", "mustard", "soya bean", "soyabean", "tobacco", "celery", "peppers", "pepper", "cucumber", "cucumbers", "squash", "kiwi", "cowpea", "cowpeas", "pumpkin", "pumpkins", "eggplant", "onion", "onions", "cassava", "rapeseed", "common bean", "eggplant")
+crops <- c("soybean", "sunflower", "canola", "lettuce", "dry bean", "blueberry", "carrot", "potato", "green bean", "cabbage", "oilseed rape", "broccoli", "cauliflower", "pea", "tomato", "lucerne", "alfalfa", "groundnut", "peanut", "mustard", "soya bean", "soyabean", "tobacco", "celery", "pepper", "cucumber", "squash", "kiwi", "cowpea", "pumpkin", "eggplant", "onion", "cassava", "rapeseed", "common bean", "eggplant")
 
 crop_df <- data.frame()
 
@@ -1261,41 +1302,31 @@ crops2 = crops[i]
 print(crop_df)
 
 
-crop_df %>% 
-  mutate(crop = case_when(crops2 == "soybeans" ~ "soybean",
-                          crops2 == "soyabean" ~ "soybean",
+crop_df1 <- crop_df %>% 
+  mutate(crop = case_when(crops2 == "soyabean" ~ "soybean",
                           crops2 == "soya bean" ~ "soybean",
                           crops2 == "oilseed rape" ~ "canola",
                           crops2 == "rapeseed" ~ "canola",
-                          crops2 == "sunflowers" ~ "sunflower",
-                          crops2 == "dry beans" ~ "dry bean",
-                          crops2 == "blueberries" ~ "blueberry",
-                          crops2 == "carrots" ~ "carrot",
-                          crops2 == "potatoes" ~ "potato",
-                          crops2 == "green beans" ~ "common bean",
                           crops2 == "green bean" ~ "common bean",
-                          crops2 == "cabbages" ~ "cabbage",
-                          crops2 == "peas" ~ "pea",
-                          crops2 == "tomatoes" ~ "tomato",
-                          crops2 == "groundnuts" ~ "groundnut",
-                          crops2 == "peanuts" ~ "peanut",
-                          crops2 == "peppers" ~ "pepper",
-                          crops2 == "cucumbers" ~ "cucumber",
-                          crops2 == "cowpeas" ~ "cowpea",
-                          crops2 == "pumpkins" ~ "pumpkin",
                           crops2 == "lucerne" ~ "alfalfa",
-                          crops2 == "onions" ~ "onion",
-                          crops2 != "*" ~ crops2)) %>% 
- ggplot() + 
-  geom_col(aes(crop, count), fill = "#F0E442")+
+                          crops2 != "*" ~ crops2)) 
+
+
+
+ crop_df1 %>% 
+   ggplot() + 
+  geom_col(aes(reorder(x = crop, -count), y = count), fill = "#F0E442")+
   theme_bw()+
   labs(y = "Frequency", x = "Sclerotinia host crop")+
+  scale_y_continuous(limits = c(0, 600), breaks = seq(0, 600, by = 100))+
+  coord_flip()+
   theme(axis.title.x=element_text(size=18,face="bold"),
        axis.title.y=element_text(size=18,face="bold"),
        axis.text.y = element_text(size = 14, color = "black"),
        axis.text.x = element_text(size = 14, color = "black", angle = 90))+
   ggsave("plots/crops_bar.png", units = "cm", 
-            width = 30, height = 20, dpi = 150)
+            width = 30, height = 20, dpi = 300)
+ 
 
  
 #hoeveelheid van sonneblom vs soja uit title en abstract wys die fokus, earliest crop recorded en hoeveel info beskikbaar is namate sy eerste record and why 
@@ -1311,9 +1342,9 @@ crop_df %>%
   theme(axis.title.x=element_text(size=14,face="bold"),
        axis.title.y=element_text(size=14,face="bold"),
        axis.text.y = element_text(size = 10, color = "black"),
-       axis.text.x = element_text(size = 10, color = "black", angle = 90))+
+       axis.text.x = element_text(size = 10, color = "black"))+
   ggsave("plots/crops_soja_sun_bar_abs.png", units = "cm", 
-            width = 50, height = 30, dpi = 150)
+            width = 50, height = 30, dpi = 300)
 
 # uit title
 
@@ -1336,7 +1367,7 @@ crops2 = crops[i]
 crop_df2 %>% 
   filter(crops2 %in% c("soybean", "sunflower")) %>% 
   ggplot() + 
-  geom_col(aes(crops2, count), fill = "#FFDB6D" )+
+  geom_col(aes(reorder(x = crops2, -count), count), fill = "#FFDB6D" )+
   theme_bw()+
   labs(y = "Frequency", x = "Sclerotinia host crop")+
   theme(axis.title.x=element_text(size=14,face="bold"),
@@ -1344,8 +1375,7 @@ crop_df2 %>%
        axis.text.y = element_text(size = 10, color = "black"),
        axis.text.x = element_text(size = 10, color = "black"))+
   ggsave("plots/crops_soja_sun_bar_title.png", units = "cm", 
-            width = 30, height = 20, dpi = 150)
-
+            width = 30, height = 20, dpi = 300)
 
 
 
@@ -1357,7 +1387,7 @@ crop_df2 %>%
 ```{r}
 
 
-active_ingredient <- c("procymidone", "pyraclostrobin", "epoxiconazole", "azoxystrobin", "prothioconazole", "tebuconazole", "dimoxystrobin", "fluazinam", "fluopyram", "carbendazim", "thiophanate-methyl", "boscalid", "fludioxonil", "benomyl", "thiram", "pentachloronitrobenzene", "quintozene", "metconazole", "dimethachlone")
+active_ingredient <- c("procymidone", "pyraclostrobin", "epoxiconazole", "azoxystrobin", "prothioconazole", "tebuconazole", "dimoxystrobin", "fluazinam", "fluopyram", "carbendazim", "thiophanate-methyl", "boscalid", "fludioxonil", "benomyl", "thiram", "cyprodinil", "quintozene", "metconazole", "dimethachlone", "propiconazole", "triticonazole")
 
 actives_df <- data.frame()
 
@@ -1377,9 +1407,7 @@ active_col = active_ingredient[i]
 
 print(actives_df)
 
-actives_df <- actives_df %>% 
-  mutate(active_col = case_when(active_col == "pentachloronitrobenzene" ~ "quintozene",
-                              active_col != "*" ~ active_col)) 
+
 
 actives_df %>% 
   mutate(active_col = toupper(active_col)) %>% 
@@ -1393,7 +1421,7 @@ actives_df %>%
        axis.text.x = element_text(size = 10, color = "black"))+
   coord_flip()+
   ggsave("plots/active_bar.png", units = "cm", 
-            width = 30, height =20, dpi = 150)
+            width = 30, height =20, dpi = 300)
 
 ```
 
@@ -1448,9 +1476,7 @@ cropactive_df1 = cropactive_df %>%
                         crop == "pumpkins" ~ "pumpkin",
                         crop == "lucerne" ~ "alfalfa",
                         crop == "onions" ~ "onion",
-                        crop != "*" ~ crop),
-           active = case_when(active == "pentachloronitrobenzene" ~ "quintozene",
-                              active != "*" ~ active)) %>% 
+                        crop != "*" ~ crop)) %>% 
  filter(crop %in% c("soybean", "sunflower", "canola"))
 
 
@@ -1459,6 +1485,7 @@ cropactive_df1 %>%
   mutate(active = toupper(active)) %>% 
   ggplot() + 
   geom_col(aes(fill = crop, x = reorder(active, -count_crop), y = count_crop), position = "stack")+
+  scale_y_continuous(limits = c(0, 40), breaks = seq(0, 40, by = 10))+
   theme_bw()+
   labs(y = "Number of articles", x = "Active ingredient")+
   scale_fill_manual(values = wes_palette("Moonrise1", n = 3), name = "Host crop")+
@@ -1470,11 +1497,15 @@ cropactive_df1 %>%
        legend.title = element_text(size = 18))+
     coord_flip()+
   ggsave("plots/crop_active_bar.png", units = "cm", 
-            width = 30, height = 20, dpi = 150)
+            width = 30, height = 20, dpi = 300)
 
 cropactive_df1 %>%
   group_by(active) %>%
-  summarise_at(vars(count_crop), funs(sum(., na.rm=TRUE))) 
+  summarise_at(vars(count_active), funs(sum(., na.rm=TRUE))) 
+
+cropactive_df1 %>%
+  group_by(crop) %>%
+  summarise_at(vars(count_crop), funs(sum(., na.rm=TRUE)))
 
 
 ```
@@ -1566,7 +1597,7 @@ teveel data gaan missing as ek die loop op drie (crop, active en environment) ha
 #   facet_wrap(~environment)+
 #     coord_flip()+
 #   ggsave("plots/crop_active_bar.png", units = "cm", 
-#             width = 30, height = 20, dpi = 150)
+#             width = 30, height = 20, dpi = 300)
 
 
 
@@ -1620,6 +1651,7 @@ enviactive_df1 %>%
   theme_bw()+
   labs(y = "Number of articles", x = "Active ingredient")+
   scale_fill_manual(values = wes_palette("Moonrise1", n = 3), name = "Environment")+
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 10))+
    theme(axis.title.x=element_text(size=18,face="bold"),
        axis.title.y=element_text(size=18,face="bold"),
        axis.text.y = element_text(size = 14, color = "black"),
@@ -1628,11 +1660,15 @@ enviactive_df1 %>%
        legend.title = element_text(size = 18))+
     coord_flip()+
   ggsave("plots/environment_active_bar.png", units = "cm", 
-            width = 30, height = 20, dpi = 150)
+            width = 30, height = 20, dpi = 300)
+
+enviactive_df1 %>%
+  group_by(environ) %>%
+  summarise_at(vars(count_envi), funs(sum(., na.rm=TRUE))) 
 
 enviactive_df1 %>%
   group_by(active) %>%
-  summarise_at(vars(count_envi), funs(sum(., na.rm=TRUE))) 
+  summarise_at(vars(count_active), funs(sum(., na.rm=TRUE))) 
 
 ```
 
@@ -1678,7 +1714,7 @@ bio_agent_df %>%
        legend.title = element_text(size = 18))+
   coord_flip()+
   ggsave("plots/agent_bar.png", units = "cm", 
-            width = 30, height = 20, dpi = 150)
+            width = 30, height = 20, dpi = 300)
 
 
 ```
@@ -1703,7 +1739,7 @@ Freq_agc_int <- agc_df %>%
 agent = biological_control_agents[i]
 crop = crops[j]
 
-  extract_agc <- data.frame(agent, crop, environment, Freq_agc_int)
+  extract_agc <- data.frame(agent, crop, Freq_agc_int)
   cropagent_df = cropagent_df %>%
   bind_rows(extract_agc)  
 }}
@@ -1746,6 +1782,8 @@ cropagent_df1 %>%
   theme_bw()+
   labs(y = "Number of articles", x = "Biological control agent")+
  scale_fill_manual(values = wes_palette("Moonrise1", n = 3), name = "Host crop")+
+  scale_y_continuous(limits = c(0, 30), breaks = seq(0, 30, by = 10))+
+  coord_flip()+
  theme(axis.title.x=element_text(size=18,face="bold"),
        axis.title.y=element_text(size=18,face="bold"),
        axis.text.y = element_text(size = 14, color = "black", face = "italic"),
@@ -1754,11 +1792,15 @@ cropagent_df1 %>%
        legend.title = element_text(size = 18))+
   coord_flip()+
   ggsave("plots/crop_agent_bar.png", units = "cm", 
-            width = 30, height = 20, dpi = 150)
+            width = 30, height = 20, dpi = 300)
 
 cropagent_df1 %>%
   group_by(agent) %>%
   summarise_at(vars(count_crop), funs(sum(., na.rm=TRUE))) 
+
+cropagent_df1 %>%
+  group_by(crop) %>%
+  summarise_at(vars(count_crop), funs(sum(., na.rm=TRUE)))
 
 ```
 
@@ -1845,7 +1887,7 @@ teveel data gaan missing as ek die loop op drie (crop, agent en environment) har
 #   facet_wrap(~environment)+
 #   coord_flip()+
 #   ggsave("plots/crop_agent_bar.png", units = "cm", 
-#             width = 30, height = 20, dpi = 150)
+#             width = 30, height = 20, dpi = 300)
 
   
 ```
@@ -1896,6 +1938,7 @@ enviagent_df1 %>%
   theme_bw()+
   labs(y = "Number of articles", x = "Biological control agent")+
   scale_fill_manual(values = wes_palette("Moonrise1", n = 3), name = "Environment")+
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 10))+
   theme(axis.title.x=element_text(size=18,face="bold"),
        axis.title.y=element_text(size=18,face="bold"),
        axis.text.y = element_text(size = 14, color = "black", face = "italic"),
@@ -1904,12 +1947,16 @@ enviagent_df1 %>%
        legend.title = element_text(size = 18))+
     coord_flip()+
   ggsave("plots/environment_agent_bar.png", units = "cm", 
-            width = 30, height = 20, dpi = 150)
+            width = 30, height = 20, dpi = 300)
 
 enviagent_df1 %>%
   group_by(agent) %>%
   summarise_at(vars(count_envi), funs(sum(., na.rm=TRUE))) 
 
+
+enviagent_df1 %>%
+  group_by(environ) %>%
+  summarise_at(vars(count_envi), funs(sum(., na.rm=TRUE))) 
 
 ```
 
@@ -1941,7 +1988,7 @@ common_name_df %>%
   mutate(common2 = case_when(common2 == "white mold" ~ "white mould",
                              common2 != "*" ~ common2)) %>% 
  ggplot() + 
-  geom_col(aes(common2, count), fill = "#F0E442" )+
+  geom_col(aes(x = reorder(common2, -count), y = count), fill = "#F0E442" )+
   theme_bw()+
   labs(y = "Frequency", x = "Sclerotinia common name")+
   theme(axis.title.x=element_text(size=18,face="bold"),
@@ -1950,7 +1997,7 @@ common_name_df %>%
        axis.text.x = element_text(size = 14, color = "black"))+
   coord_flip()+
   ggsave("plots/commonname_bar.png", units = "cm", 
-            width = 30, height = 20, dpi = 150)
+            width = 30, height = 20, dpi = 300)
 
  
 
@@ -2002,7 +2049,8 @@ interact_df1 = interact_df %>%
                         crop == "blueberries" ~ "blueberry",
                         crop == "carrots" ~ "carrot",
                         crop == "potatoes" ~ "potato",
-                        crop == "green beans" ~ "green bean",
+                        crop == "green beans" ~ "common bean",
+                        crop == "green bean" ~ "common bean",
                         crop == "cabbages" ~ "cabbage",
                         crop == "peas" ~ "pea",
                         crop == "tomatoes" ~ "tomato",
@@ -2015,9 +2063,8 @@ interact_df1 = interact_df %>%
                         crop == "lucerne" ~ "alfalfa",
                         crop == "onions" ~ "onion",
                         crop != "*" ~ crop)) %>% 
-  filter(country %in% c("Argentina", "Australia", "Brazil", "Canada", "China", "India", "Italy", "Japan", 
-                          "New Zealand", "United States", "South Africa"),
-         crop %in% c("soybean", "sunflower", "canola", "pea", "potato", "tomato"))
+  filter(country %in% c("Argentina", "Australia", "Brazil", "Canada", "China", "India", "Italy", "Japan", "New Zealand", "United States", "South Africa"),
+         crop %in% c("soybean", "sunflower", "canola", "pea", "potato", "common bean"))
   
 
 cbp1 <- c("#CCCCCC", "#E69F00", "#FFFF99", "#CC9900",
@@ -2035,10 +2082,10 @@ interact_df1 %>%
        axis.text.x = element_text(size = 16, color = "black"),
        legend.text = element_text(size = 16),
        legend.title = element_text(size = 18))+
-  scale_y_continuous(limits = c(0, 60), breaks = seq(0, 100, by = 10))+
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 10))+
   coord_flip()+
   ggsave("plots/country_host_bar.png", units = "cm", 
-            width = 30, height = 20, dpi = 150)
+            width = 30, height = 20, dpi = 300)
 
 interact_df1 %>%
   group_by(country) %>%
@@ -2059,7 +2106,7 @@ interact_df1 %>%
 ```{r}
 
 set.seed(1234)    #reproducibility of the modeling
-png("wordcloud.png", width=400,height=400)
+png("wordcloud.png", width=800,height=800, res=200)
 wordcloud(freq$auth_key,
     freq$n,
     scale = c(2, 0.8),
@@ -2070,7 +2117,8 @@ wordcloud(freq$auth_key,
 while (!is.null(dev.list()))
 dev.off()
 
-describe(freq$n)
+
+
 
 
 
