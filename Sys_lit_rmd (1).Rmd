@@ -48,53 +48,6 @@ library(wesanderson)          #colours for ggplot
 ```
 
 
-#citing
-
-```{r}
-
-#citing R
-
-citation()
-
-RStudio.Version()
-
-
-#citing packges
-
-citation(package = "openxlsx")
-citation(package = "tidytext")
-citation(package = "tidyr")
-citation(package = "tidyverse")
-citation(package = "ggthemes")
-citation(package = "ggplot2")
-citation(package = "rvest")
-citation(package = "xml2")
-citation(package = "dplyr")
-citation(package = "plyr")
-citation(package = "data.table")
-citation(package = "wordcloud")
-citation(package = "RColorBrewer")
-citation(package = "webshot")
-citation(package = "htmlwidgets")
-citation(package = "htmlTable")
-citation(package = "Hmisc")
-citation(package = "cld3")
-citation(package = "stringr")
-citation(package = "rnaturalearthdata")
-citation(package = "rnaturalearth")
-citation(package = "sp")
-citation(package = "sf")
-citation(package = "rgeos")
-citation(package = "viridis")
-citation(package = "viridisLite")
-citation(package = "flextable")
-citation(package = "officer")
-citation(package = "wesanderson")
-
-
-```
-
-
 
 # notas
 
@@ -2011,5 +1964,53 @@ describe(freq$n)
 
 
 ```
+
+
+#citing
+
+```{r}
+
+#citing R
+
+citation()
+
+RStudio.Version()
+
+
+#citing packges
+
+citation(package = "openxlsx")
+citation(package = "tidytext")
+citation(package = "tidyr")
+citation(package = "tidyverse")
+citation(package = "ggthemes")
+citation(package = "ggplot2")
+citation(package = "rvest")
+citation(package = "xml2")
+citation(package = "dplyr")
+citation(package = "plyr")
+citation(package = "data.table")
+citation(package = "wordcloud")
+citation(package = "RColorBrewer")
+citation(package = "webshot")
+citation(package = "htmlwidgets")
+citation(package = "htmlTable")
+citation(package = "Hmisc")
+citation(package = "cld3")
+citation(package = "stringr")
+citation(package = "rnaturalearthdata")
+citation(package = "rnaturalearth")
+citation(package = "sp")
+citation(package = "sf")
+citation(package = "rgeos")
+citation(package = "viridis")
+citation(package = "viridisLite")
+citation(package = "flextable")
+citation(package = "officer")
+citation(package = "wesanderson")
+
+
+```
+
 
 
