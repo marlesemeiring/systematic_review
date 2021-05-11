@@ -7,7 +7,7 @@ output: html_document
 
 # libraries
 
-These are my
+Load these libraries in order to run the script.
 
 ```{r}
 library(openxlsx)
