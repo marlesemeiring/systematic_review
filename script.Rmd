@@ -429,6 +429,8 @@ df_a %>%
   ggsave("systematic_review/plots/source_bar.png", units = "cm", 
             width = 30, height = 20, dpi = 300)
 
+png()
+
 ```
 
 
