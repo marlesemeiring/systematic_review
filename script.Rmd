@@ -296,7 +296,7 @@ df_a %>%
         axis.title.y=element_text(size=14,face="bold"),
         axis.text.y = element_text(size = 10, color = "black"),
         axis.text.x = element_text(size = 10, color = "black", angle = 90))+ 
-  ggsave("systematic_review/plots/years_1_bar.png", units = "cm", 
+  ggsave("plots/years_1_bar.png", units = "cm", 
             width = 30, height = 20, dpi = 300)
 
 ```
@@ -348,7 +348,7 @@ dplyr::summarise(total_citation = sum(cited)) %>%
        axis.title.y=element_text(size=18,face="bold"),
        axis.text.y = element_text(size = 14, color = "black"),
        axis.text.x = element_text(size = 14, color = "black"))+
-  ggsave("systematic_review/plots/authors_cited_bar.png", units = "cm", 
+  ggsave("plots/authors_cited_bar.png", units = "cm", 
             width = 30, height = 20, dpi = 300)
 
 
@@ -389,7 +389,7 @@ ggplot() +
        axis.title.y=element_text(size=18,face="bold"),
        axis.text.y = element_text(size = 14, color = "black"),
        axis.text.x = element_text(size = 14, color = "black"))+
-  ggsave("systematic_review/plots/authors_written_bar.png", units = "cm", 
+  ggsave("plots/authors_written_bar.png", units = "cm", 
             width = 30, height = 30, dpi = 300)
 
 
@@ -426,10 +426,9 @@ df_a %>%
        axis.title.y=element_text(size=14,face="bold"),
        axis.text.y = element_text(size = 10, color = "black"),
        axis.text.x = element_text(size = 10, color = "black"))+
-  ggsave("systematic_review/plots/source_bar.png", units = "cm", 
+  ggsave("plots/source_bar.png", units = "cm", 
             width = 30, height = 20, dpi = 300)
 
-png()
 
 ```
 
@@ -450,7 +449,7 @@ freq %>%
        axis.text.y = element_text(size = 10, color = "black"),
        axis.text.x = element_text(size = 10, color = "black"))+
   labs(y = "Frequency", x = "Author keywords")+
-  ggsave("systematic_review/plots/freq_auth_bar.png", units = "cm", 
+  ggsave("plots/freq_auth_bar.png", units = "cm", 
             width = 30, height = 20, dpi = 300)
 
 
@@ -501,7 +500,7 @@ mapping %>%
        axis.text.y = element_text(size = 10, color = "black"),
        axis.text.x = element_text(size = 10, color = "black"))+
   coord_flip()+
-  ggsave("systematic_review/plots/country_bar.png", units = "cm", 
+  ggsave("plots/country_bar.png", units = "cm", 
             width = 30, height = 20, dpi = 300)
 
 mapping %>%
@@ -556,7 +555,7 @@ ggplot(data = world.df) +
           legend.title = element_text(size = 30))+
     theme(legend.key = element_rect(fill = "white"), 
                  legend.key.size = unit(2, "cm"))+
-  ggsave("systematic_review/plots/map1.png", units = "cm", 
+  ggsave("plots/map1.png", units = "cm", 
             width = 80, height = 50, dpi = 600)
 
 ```
@@ -577,7 +576,9 @@ Elimination -
 
 # all
 
-manage <- c("fungicide", "chemical control", "biological control", "crop rotation", "sowing date", "planting date", "date of planting", "soil solarization", "soil solarisation", "partial resistance", "percentage of sclerotia in seed", "certified seed", "remove infected stubble", "burning of stubble", "weed control", "site selection", "selection of locality", "selection of location", "location selection", "cultural control", "cultivar selection", "biocontrol", "seed treatment", "genotype selection", "resistance breeding", "tillage", "no till", "cultural practices", "planting density", "row width", "forecast", "forecasting", "early warning", "biopesticide", "mycoparasite", "cover crop", "fumigation", "antagonist", "resistant cultivars", "no-tillage", "no tillage", "ploughing", "plant population", "nutrition", "disease prediction", "disease modelling", "soil pH", "sanitation", "heat treatment", "induced resistance", "reduced tillage", "row spacing", "host resistance", "prediction models", "plant density", "manure", "environment selection", "selection of the environment", "clean seed", "International Seed Testing Association", "ISTA")
+manage <- c("fungicide", "chemical control", "biological control", "crop rotation", "sowing date", "planting date", "date of planting", "soil solarization", "soil solarisation", "partial resistance", "percentage of sclerotia in seed", "certified seed", "remove infected stubble", "burning of stubble", "weed control", "site selection", "selection of locality", "selection of location", "location selection", "cultural control", "cultivar selection", "biocontrol", "seed treatment", "genotype selection", "resistance breeding", "tillage", "no till", "cultural practices", "planting density", "row width", "forecast", "forecasting", "early warning", "biopesticide", "mycoparasite", "cover crop", "fumigation", "antagonist", "resistant cultivars", "no-tillage", "no tillage", "ploughing", "plant population", "nutrition", "disease prediction", "disease modelling", "soil pH", "sanitation", "heat treatment", "induced resistance", "reduced tillage", "row spacing", "host resistance", "prediction models", "plant density", "manure", "environment selection", "selection of the environment", "clean seed", "International Seed Testing Association", "ISTA", "mycovirus")
+
+write.csv(manage, "C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\systematic_review\\data\\management_prac.csv")
 
 managing <- data.frame()
 
@@ -640,7 +641,7 @@ manage %>%
        axis.title.y=element_text(size=14,face="bold"),
        axis.text.y = element_text(size = 10, color = "black"),
        axis.text.x = element_text(size = 10, color = "black", angle = 90))+
-  ggsave("systematic_review/plots/manage_bar.png", units = "cm", 
+  ggsave("plots/manage_bar.png", units = "cm", 
             width = 50, height = 30, dpi = 300)
 
 # groups
@@ -683,7 +684,7 @@ manage %>%
        axis.title.y=element_text(size=14,face="bold"),
        axis.text.y = element_text(size = 10, color = "black"),
        axis.text.x = element_text(size = 10, color = "black", angle = 90))+
-  ggsave("systematic_review/plots/manage_bar_6.png", units = "cm", 
+  ggsave("plots/manage_bar_6.png", units = "cm", 
             width = 30, height = 20, dpi = 300)
 
 manage_tabe <- flextable(manage %>% 
@@ -724,7 +725,7 @@ manage_tabe <- flextable(manage %>%
 
 read_docx() %>% 
   body_add_flextable(value = manage_tabe) %>% 
-  print(target = "systematic_review/plots/manageplot_table.docx")
+  print(target = "plots/manageplot_table.docx")
 
 man <- manage %>% 
   mutate(manage_prac2 = case_when(manage_prac1 =="planting date" ~ "Avoidance",
@@ -762,6 +763,55 @@ man <- manage %>%
 man %>%
   group_by(manage_prac2) %>%
   summarise_at(vars(frequency), funs(sum(., na.rm=TRUE))) 
+
+```
+
+# manage x year
+
+```{r}
+
+year_raw = read.xlsx("C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\systematic_review\\data\\year.xlsx", "Sheet1") 
+
+write.csv(year_raw, "C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\systematic_review\\data\\years.csv")
+
+years <- as.vector(year_raw$year)
+
+mg_yr <- data.frame()
+
+for (i in 1:length(manage)) {
+for (j in 1:length(years)){
+  
+  my_df = df_a %>%
+    filter(str_detect(abs, as.character(manage[i])) &
+           str_detect(abs, as.character(years[j])))
+  
+Freq_my_int <- my_df %>% 
+      dplyr::summarise(count_manage = n(),
+                        count_years = n())
+
+management = manage[i]
+year = years[j]
+
+  extract_my <- data.frame(management, year, Freq_my_int)
+  mg_yr = mg_yr %>%
+  bind_rows(extract_my)  
+}}
+
+
+mg_yr %>% 
+  ggplot() + 
+  geom_col(aes(fill = manage_prac, x = year, y = count_manage), position = "stack")+
+  theme_bw()+
+  labs(y = "Counts", x = "Year")+
+  scale_fill_grey(name = "Management practice")+
+  theme(axis.title.x=element_text(size=18,face="bold"),
+       axis.title.y=element_text(size=18,face="bold"),
+       axis.text.y = element_text(size = 14, color = "black"),
+       axis.text.x = element_text(size = 14, color = "black"),
+       legend.text = element_text(size = 16),
+       legend.title = element_text(size = 18))+
+  ggsave("plots/year_manage_bar.png", units = "cm", 
+            width = 30, height = 20, dpi = 300)
 
 ```
 
@@ -812,7 +862,7 @@ crop_df1 <- crop_df %>%
        axis.title.y=element_text(size=18,face="bold"),
        axis.text.y = element_text(size = 14, color = "black"),
        axis.text.x = element_text(size = 14, color = "black", angle = 90))+
-  ggsave("systematic_review/plots/crops_bar.png", units = "cm", 
+  ggsave("plots/crops_bar.png", units = "cm", 
             width = 30, height = 20, dpi = 300)
  
 
@@ -830,7 +880,7 @@ crop_df %>%
        axis.title.y=element_text(size=14,face="bold"),
        axis.text.y = element_text(size = 10, color = "black"),
        axis.text.x = element_text(size = 10, color = "black"))+
-  ggsave("systematic_review/plots/crops_soja_sun_bar_abs.png", units = "cm", 
+  ggsave("plots/crops_soja_sun_bar_abs.png", units = "cm", 
             width = 50, height = 30, dpi = 300)
 
 # from title - sunflower and soybean
@@ -861,7 +911,7 @@ crop_df2 %>%
        axis.title.y=element_text(size=14,face="bold"),
        axis.text.y = element_text(size = 10, color = "black"),
        axis.text.x = element_text(size = 10, color = "black"))+
-  ggsave("systematic_review/plots/crops_soja_sun_bar_title.png", units = "cm", 
+  ggsave("plots/crops_soja_sun_bar_title.png", units = "cm", 
             width = 30, height = 20, dpi = 300)
 
 ```
@@ -904,7 +954,7 @@ actives_df %>%
        axis.text.y = element_text(size = 10, color = "black"),
        axis.text.x = element_text(size = 10, color = "black"))+
   coord_flip()+
-  ggsave("systematic_review/plots/active_bar.png", units = "cm", 
+  ggsave("plots/active_bar.png", units = "cm", 
             width = 30, height =20, dpi = 300)
 
 ```
@@ -982,7 +1032,7 @@ cropactive_df1 %>%
        legend.text = element_text(size = 16),
        legend.title = element_text(size = 18))+
     coord_flip()+
-  ggsave("systematic_review/plots/crop_active_bar.png", units = "cm", 
+  ggsave("plots/crop_active_bar.png", units = "cm", 
             width = 30, height = 20, dpi = 300)
 
 cropactive_df1 %>%
@@ -1053,7 +1103,7 @@ enviactive_df1 %>%
        legend.text = element_text(size = 16),
        legend.title = element_text(size = 18))+
     coord_flip()+
-  ggsave("systematic_review/plots/environment_active_bar.png", units = "cm", 
+  ggsave("plots/environment_active_bar.png", units = "cm", 
             width = 30, height = 20, dpi = 300)
 
 enviactive_df1 %>%
@@ -1103,7 +1153,7 @@ bio_agent_df %>%
        legend.text = element_text(size = 16),
        legend.title = element_text(size = 18))+
   coord_flip()+
-  ggsave("systematic_review/plots/agent_bar.png", units = "cm", 
+  ggsave("plots/agent_bar.png", units = "cm", 
             width = 30, height = 20, dpi = 300)
 
 
@@ -1182,7 +1232,7 @@ cropagent_df1 %>%
        legend.text = element_text(size = 16),
        legend.title = element_text(size = 18))+
   coord_flip()+
-  ggsave("systematic_review/plots/crop_agent_bar.png", units = "cm", 
+  ggsave("plots/crop_agent_bar.png", units = "cm", 
             width = 30, height = 20, dpi = 300)
 
 cropagent_df1 %>%
@@ -1250,7 +1300,7 @@ enviagent_df1 %>%
        legend.text = element_text(size = 16),
        legend.title = element_text(size = 18))+
     coord_flip()+
-  ggsave("systematic_review/plots/environment_agent_bar.png", units = "cm", 
+  ggsave("plots/environment_agent_bar.png", units = "cm", 
             width = 30, height = 20, dpi = 300)
 
 enviagent_df1 %>%
@@ -1299,7 +1349,7 @@ common_name_df %>%
        axis.text.y = element_text(size = 14, color = "black"),
        axis.text.x = element_text(size = 14, color = "black"))+
   coord_flip()+
-  ggsave("systematic_review/plots/commonname_bar.png", units = "cm", 
+  ggsave("plots/commonname_bar.png", units = "cm", 
             width = 30, height = 20, dpi = 300)
 
 ```
@@ -1381,7 +1431,7 @@ interact_df1 %>%
        legend.title = element_text(size = 18))+
   scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 10))+
   coord_flip()+
-  ggsave("systematic_review/plots/country_host_bar.png", units = "cm", 
+  ggsave("plots/country_host_bar.png", units = "cm", 
             width = 30, height = 20, dpi = 300)
 
 interact_df1 %>%
