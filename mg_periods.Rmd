@@ -1,0 +1,72 @@
+---
+title: "Untitled"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# library 
+```{r}
+library(tidyverse)
+library(ggthemes)
+```
+
+# data
+```{r}
+litrev_df_a <- read.csv(file.choose()) %>% select(-X)
+management_prac <- read.csv(file.choose()) %>% select(-X)
+years <- read.csv(file.choose()) %>% select(-X)
+```
+
+# plots 
+```{r}
+mg <- unique(management_prac$manage_prac)
+
+mg_yr <- data.frame()
+
+
+for (i in 1:length(mg)) {
+
+  my_df = litrev_df_a %>%
+        mutate(mg = case_when(str_detect(abs, mg[i]) ~ mg[i]))
+           #str_detect(abs, as.character(years[j])))
+  
+  Freq_my_int <- my_df %>%
+  group_by(year, mg) %>% 
+      dplyr::summarise(count_manage = n())
+
+  extract_my <- data.frame(Freq_my_int)
+  mg_yr = mg_yr %>%
+  bind_rows(extract_my) %>% na.omit()  
+}
+# adding periods
+periods <- mg_yr %>% 
+  mutate(period = case_when(year >= 1920 & year <= 1929  ~ "1920-1929",
+                            year >= 1930 & year <= 1939  ~ "1930-1939",
+                            year >= 1940 & year <= 1949  ~ "1940-1949",
+                            year >= 1950 & year <= 1959  ~ "1950-1959",
+                            year >= 1960 & year <= 1969  ~ "1960-1969",
+                            year >= 1970 & year <= 1979  ~ "1970-1979",
+                            year >= 1980 & year <= 1989  ~ "1980-1989",
+                            year >= 1990 & year <= 1999  ~ "1990-1999",
+                            year >= 2000 & year <= 2009  ~ "2000-2009",
+                            year >= 2010 & year <= 2019  ~ "2010-2019",
+                            year >= 2020 & year <= 2029  ~ "2020-2029")) 
+
+periods$period <- as.factor(periods$period)
+
+periods
+
+periods %>% 
+  filter(mg %in% c("biocontrol", "biological control", "fungicide", "chemical control")) %>% 
+  ggplot(aes(period, count_manage))+
+  geom_col()+
+    facet_wrap(~mg)+
+  theme_clean()
+
+unique(periods$mg)
+#avoidance, erad, prot, exclusion, forecasting, therapy 
+
+```

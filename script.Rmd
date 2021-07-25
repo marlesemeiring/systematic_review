@@ -576,7 +576,7 @@ Elimination -
 
 # all
 
-manage <- c("fungicide", "chemical control", "biological control", "crop rotation", "sowing date", "planting date", "date of planting", "soil solarization", "soil solarisation", "partial resistance", "percentage of sclerotia in seed", "certified seed", "remove infected stubble", "burning of stubble", "weed control", "site selection", "selection of locality", "selection of location", "location selection", "cultural control", "cultivar selection", "biocontrol", "seed treatment", "genotype selection", "resistance breeding", "tillage", "no till", "cultural practices", "planting density", "row width", "forecast", "forecasting", "early warning", "biopesticide", "mycoparasite", "cover crop", "fumigation", "antagonist", "resistant cultivars", "no-tillage", "no tillage", "ploughing", "plant population", "nutrition", "disease prediction", "disease modelling", "soil pH", "sanitation", "heat treatment", "induced resistance", "reduced tillage", "row spacing", "host resistance", "prediction models", "plant density", "manure", "environment selection", "selection of the environment", "clean seed", "International Seed Testing Association", "ISTA", "mycovirus")
+manage <- c("fungicide", "chemical control", "biological control", "crop rotation", "sowing date", "planting date", "date of planting", "soil solarization", "soil solarisation", "partial resistance", "percentage of sclerotia in seed", "certified seed", "remove infected stubble", "burning of stubble", "weed control", "site selection", "selection of locality", "selection of location", "location selection", "cultural control", "cultivar selection", "biocontrol", "seed treatment", "genotype selection", "resistance breeding", "tillage", "no till", "cultural practices", "planting density", "row width", "forecast", "forecasting", "early warning", "biopesticide", "mycoparasite", "cover crop", "fumigation", "antagonist", "resistant cultivars", "no-tillage", "no tillage", "ploughing", "plant population", "nutrition", "disease prediction", "disease modelling", "soil pH", "sanitation", "heat treatment", "induced resistance", "reduced tillage", "row spacing", "host resistance", "prediction models", "plant density", "manure", "environment selection", "selection of the environment", "clean seed", "International Seed Testing Association", "ISTA", "mycovirus", "bio-control", "bio control")
 
 write.csv(manage, "C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\systematic_review\\data\\management_prac.csv")
 
@@ -631,6 +631,8 @@ manage <- managing %>%
                                   manage_prac == "clean seed" ~ "certified seed",
                                   manage_prac == "International Seed Testing Association" ~ "certified seed",
                                   manage_prac == "ISTA" ~ "certified seed",
+                                  manage_prac == "bio-control" ~ "biological control",
+                                  manage_prac == "bio control" ~ "biological control",
                                   manage_prac != "*" ~ manage_prac))
 manage %>% 
  ggplot() + 
@@ -770,48 +772,97 @@ man %>%
 
 ```{r}
 
-year_raw = read.xlsx("C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\systematic_review\\data\\year.xlsx", "Sheet1") 
+# year_raw = read.xlsx("C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\systematic_review\\data\\year.xlsx", "Sheet1") 
+# 
+# write.csv(year_raw, "C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\systematic_review\\data\\years.csv")
+# 
+# litrev_df_a <- read.csv(file.choose()) %>% select(-X)
+ # management_prac <- read.csv(file.choose()) %>% select(-X)
+# # years <- read.csv(file.choose()) %>% select(-X)
+# 
+# write.csv(litrev_df_a, "C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\systematic_review\\data\\litrev_df_a")
+# write.csv(management_prac, "C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\systematic_review\\data\\litrev_df_a")
 
-write.csv(year_raw, "C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\systematic_review\\data\\years.csv")
 
-years <- as.vector(year_raw$year)
+
+mg <- unique(man$manage_prac1)
 
 mg_yr <- data.frame()
 
-for (i in 1:length(manage)) {
-for (j in 1:length(years)){
-  
-  my_df = df_a %>%
-    filter(str_detect(abs, as.character(manage[i])) &
-           str_detect(abs, as.character(years[j])))
-  
-Freq_my_int <- my_df %>% 
-      dplyr::summarise(count_manage = n(),
-                        count_years = n())
 
-management = manage[i]
-year = years[j]
+for (i in 1:length(mg)) {
 
-  extract_my <- data.frame(management, year, Freq_my_int)
+  my_df = litrev_df_a %>%
+        mutate(mg = case_when(str_detect(abs, mg[i]) ~ mg[i]))
+           #str_detect(abs, as.character(years[j])))
+  
+  Freq_my_int <- my_df %>%
+  group_by(year, mg) %>% 
+      dplyr::summarise(count_manage = n())
+
+  extract_my <- data.frame(Freq_my_int)
   mg_yr = mg_yr %>%
-  bind_rows(extract_my)  
-}}
+  bind_rows(extract_my) %>% na.omit()  
+}
+# adding periods
+periods <- mg_yr %>% 
+  mutate(period = case_when(year >= 1920 & year <= 1929  ~ "1920-1929",
+                            year >= 1930 & year <= 1939  ~ "1930-1939",
+                            year >= 1940 & year <= 1949  ~ "1940-1949",
+                            year >= 1950 & year <= 1959  ~ "1950-1959",
+                            year >= 1960 & year <= 1969  ~ "1960-1969",
+                            year >= 1970 & year <= 1979  ~ "1970-1979",
+                            year >= 1980 & year <= 1989  ~ "1980-1989",
+                            year >= 1990 & year <= 1999  ~ "1990-1999",
+                            year >= 2000 & year <= 2009  ~ "2000-2009",
+                            year >= 2010 & year <= 2019  ~ "2010-2019",
+                            year >= 2020 & year <= 2029  ~ "2020-2029")) 
+
+periods$period <- as.factor(periods$period)
+
+periods_2 <- periods %>% 
+  mutate(mg_2 = case_when(mg =="planting date" ~ "Avoidance",
+                                 mg == "soil solarisation" ~ "Eradication",
+                                 mg == "planting date" ~ "Avoidance",
+                                 mg == "certified seed" ~ "Exclusion", 
+                                 mg == "location selection" ~ "Avoidance",
+                                 mg == "fungicide" ~ "Protection",
+                                 mg == "crop rotation" ~ "Eradication", 
+                                 mg == "biological control" ~ "Eradication",
+                                 mg == "resistance breeding"  ~ "Resistance",
+                                 mg == "remove infected stubble" ~ "Eradication",
+                                 mg == "burning of stubble" ~ "Eradication",
+                                 mg == "weed control" ~ "Eradication",
+                                 mg == "no tillage" ~ "Protection", 
+                                 mg == "tillage" ~ "Protection",
+                                 mg == "reduced tillage" ~ "Protection",
+                                 mg == "seed treatment" ~ "Exclusion",
+                                 mg == "plant population" ~ "Avoidance",
+                                 mg == "nutrition" ~ "Protection",
+                                 mg == "fumigation" ~ "Protection",
+                                 mg == "row width" ~ "Avoidance",
+                                 mg == "cultural practices" ~ "Avoidance",
+                                 mg == "sanitation" ~ "Exclusion",
+                                 mg == "heat treatment" ~ "Eradication",
+                                 mg == "soil pH" ~ "Protection",
+                                 mg == "prediction models" ~ "Disease forecast",
+                                 mg == "induced resistance" ~ "Resistance",
+                                 mg == "cover crop" ~ "Avoidance",
+                                 mg == "manure" ~ "Exclusion",
+                                  mg != "*" ~ mg)) %>% 
+  group_by(mg_2, mg, period) %>% 
+  dplyr::summarize(frequency = sum(count_manage))
 
 
-mg_yr %>% 
-  ggplot() + 
-  geom_col(aes(fill = manage_prac, x = year, y = count_manage), position = "stack")+
-  theme_bw()+
-  labs(y = "Counts", x = "Year")+
-  scale_fill_grey(name = "Management practice")+
-  theme(axis.title.x=element_text(size=18,face="bold"),
-       axis.title.y=element_text(size=18,face="bold"),
-       axis.text.y = element_text(size = 14, color = "black"),
-       axis.text.x = element_text(size = 14, color = "black"),
-       legend.text = element_text(size = 16),
-       legend.title = element_text(size = 18))+
-  ggsave("plots/year_manage_bar.png", units = "cm", 
-            width = 30, height = 20, dpi = 300)
+periods_2 %>%
+  ggplot()+
+  geom_col(aes(fill = mg, x = period, y = frequency), position = "stack")+
+    facet_wrap(~mg_2)+
+  theme_clean()
+
+unique(periods$mg)
+#avoidance, erad, prot, exclusion, forecasting, therapy 
+
 
 ```
 
@@ -820,7 +871,7 @@ mg_yr %>%
 
 ```{r}
 
-crops <- c("soybean", "sunflower", "canola", "lettuce", "dry bean", "blueberry", "carrot", "potato", "green bean", "cabbage", "oilseed rape", "broccoli", "cauliflower", "pea", "tomato", "lucerne", "alfalfa", "groundnut", "peanut", "mustard", "soya bean", "soyabean", "tobacco", "celery", "pepper", "cucumber", "squash", "kiwi", "cowpea", "pumpkin", "eggplant", "onion", "cassava", "rapeseed", "common bean", "eggplant")
+crops <- c("soybean", "sunflower", "canola", "lettuce", "dry bean", "blueberry", "carrot", "potato", "green bean", "cabbage", "oilseed rape", "broccoli", "cauliflower", "pea", "tomato", "lucerne", "alfalfa", "groundnut", "peanut", "mustard", "soya bean", "soyabean", "tobacco", "celery", "pepper", "cucumber", "squash", "kiwi", "cowpea", "pumpkin", "eggplant", "onion", "cassava", "rapeseed", "common bean", "eggplant", "Brassica napus", "Glycine max", "Helianthus annuus")
 
 crop_df <- data.frame()
 
@@ -847,6 +898,9 @@ crop_df1 <- crop_df %>%
                           crops2 == "rapeseed" ~ "canola",
                           crops2 == "green bean" ~ "common bean",
                           crops2 == "lucerne" ~ "alfalfa",
+                          crops2 == "Brassica napus" ~ "canola",
+                          crops2 == "Glycine max" ~ "soybean",
+                          crops2 == "Helianthus annuus" ~ "sunflower",
                           crops2 != "*" ~ crops2)) 
 
 
@@ -870,7 +924,7 @@ crop_df1 <- crop_df %>%
 
 # from abstracts - sunflower and soybean
 
-crop_df %>% 
+crop_df1 %>% 
   filter(crops2 %in% c("soybean", "sunflower")) %>% 
   ggplot() + 
   geom_col(aes(crops2, count), fill = "grey" )+
@@ -1012,6 +1066,9 @@ cropactive_df1 = cropactive_df %>%
                         crop == "pumpkins" ~ "pumpkin",
                         crop == "lucerne" ~ "alfalfa",
                         crop == "onions" ~ "onion",
+                        crop == "Brassica napus" ~ "canola",
+                        crop == "Glycine max" ~ "soybean",
+                        crop == "Helianthus annuus" ~ "sunflower",
                         crop != "*" ~ crop)) %>% 
  filter(crop %in% c("soybean", "sunflower", "canola"))
 
@@ -1212,7 +1269,10 @@ cropagent_df1 = cropagent_df %>%
                         crop == "cowpeas" ~ "cowpea",
                         crop == "pumpkins" ~ "pumpkin",
                         crop == "lucerne" ~ "alfalfa",
-                         crop == "onions" ~ "onion",
+                        crop == "onions" ~ "onion",
+                        crop == "Brassica napus" ~ "canola",
+                        crop == "Glycine max" ~ "soybean",
+                        crop == "Helianthus annuus" ~ "sunflower",
                         crop != "*" ~ crop)) %>% 
  filter(crop %in% c("soybean", "sunflower", "canola"))
   
@@ -1413,7 +1473,7 @@ interact_df1 = interact_df %>%
                         crop == "onions" ~ "onion",
                         crop != "*" ~ crop)) %>% 
   filter(country %in% c("Argentina", "Australia", "Brazil", "Canada", "China", "India", "Italy", "Japan", "New Zealand", "United States", "South Africa"),
-         crop %in% c("soybean", "sunflower", "canola", "pea", "potato", "common bean"))
+         crop %in% c("soybean", "sunflower", "canola"))   #uitgehaal , "pea", "potato", "common bean"
   
 
 
@@ -1483,18 +1543,18 @@ citation(package = "tidyr")
 citation(package = "tidyverse")
 citation(package = "ggthemes")
 citation(package = "ggplot2")
-citation(package = "rvest")
+# citation(package = "rvest")
 citation(package = "xml2")
 citation(package = "dplyr")
 citation(package = "plyr")
 citation(package = "data.table")
-citation(package = "wordcloud")
+# citation(package = "wordcloud")
 citation(package = "RColorBrewer")
-citation(package = "webshot")
-citation(package = "htmlwidgets")
+# citation(package = "webshot")
+# citation(package = "htmlwidgets")
 citation(package = "htmlTable")
 citation(package = "Hmisc")
-citation(package = "cld3")
+# citation(package = "cld3")
 citation(package = "stringr")
 citation(package = "rnaturalearthdata")
 citation(package = "rnaturalearth")
