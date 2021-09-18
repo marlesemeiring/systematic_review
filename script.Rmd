@@ -1178,7 +1178,7 @@ enviactive_df1 %>%
 
 ```{r}
 
-biological_control_agents <- c("Trichoderma koningii", "Coniothyrium minitans", "Trichoderma viride", "Trichoderma harzianum", "Bacillus cereus", "Pseudomonas chlororaphis", "Bacillus amyloliquefaciens", "Streptomyces lydicus", "Ulocladium atrum", "Bacillus subtilis")
+biological_control_agents <- c("Trichoderma koningii", "Coniothyrium minitans", "Trichoderma viride", "Trichoderma harzianum", "Bacillus cereus", "Pseudomonas chlororaphis", "Bacillus amyloliquefaciens", "Streptomyces lydicus", "Ulocladium atrum", "Bacillus subtilis", "SsHADV-1", "SsNSRV-1", "SsDRV")
 
 bio_agent_df <- data.frame()
 
