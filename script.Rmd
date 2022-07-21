@@ -31,7 +31,7 @@ library(htmlwidgets)          #save wordcloud
 library(htmlTable)
 
 library(Hmisc)                #describe
-
+7
 library(cld3)                 #detect and translate
 
 library(stringr)              #sentence case, split en ruil om initials and surname
@@ -279,9 +279,13 @@ print(freq)
 freq %>% 
   na.omit()
 
-
 library(wordcloud)
 library(RColorBrewer)
+```
+
+#SASPP word cloud 
+```{r}
+
 ```
 
 
