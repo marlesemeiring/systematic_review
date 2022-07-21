@@ -60,112 +60,114 @@ library(forcats)              #reorder in ggplot
 
 #import and merge csv files
 
-setwd("C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Raw_data\\Scopus_12Jan")
-scopus_raw2 <- ldply(list.files(), read.csv, header=TRUE)
-write.csv(scopus_raw2, "C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\systematic_review\\data\\scopus_raw2.csv")
+#setwd("C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Raw_data\\Scopus_12Jan")
+#scopus_raw2 <- ldply(list.files(), read.csv, header=TRUE)
+#write.csv(scopus_raw2, "C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\systematic_review\\data\\scopus_raw2.csv")
 
 
 
 #import different sheets van Web of Science en ScienceDirect
 
-science_raw = read.xlsx("C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Raw_data\\Science_direct\\ScienceDirect2.xlsx", "ScienceDirect1")
-
-web_raw = read.xlsx("C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Raw_data\\web_of_science.xlsx", "1")
-
-names(scopus_raw2)
-
-#selection specifics
-
-df1 <- scopus_raw2 %>% 
-  select("ï..Authors", "Year", "Abstract", "Title", "Author.Keywords", "Cited.by", "Document.Type") %>% 
-  dplyr::rename("authors" = "ï..Authors",
-                "year" = "Year",
-                "abstract" = "Abstract",
-                "title" = "Title",
-                "author_keyword" = "Author.Keywords",
-                "cited" = "Cited.by",
-                "type" = "Document.Type") %>% 
-  mutate(source_main = "Scopus") 
-
-setDT(df1)[, paste0("authors", 1:72) := tstrsplit(authors, ",")]
-
-df1 <- within(df1, rm(authors))
-
-df1 <- df1 %>%  
-  dplyr::rename(authors = authors1)
-
-df1$authors <- gsub(".", "", df1$authors, fixed=TRUE)
-
-df1$authors <- df1$authors %>%
-                 str_to_upper()
-df1 <- df1 %>%
-          select("authors", "year", "title", "author_keyword", "cited", "type", "source_main", "abstract")
-
-
-
-
-df2 <- web_raw %>% 
-  select("Keyword", "Authors", "Year", "Abstract", "Title", "Authors", "Author.Keywords", "Times.Cited,.All.Databases",     "Document.Type") %>% 
-dplyr::rename("keyword" = "Keyword",
-         "authors" = "Authors",
-         "year" = "Year",
-         "abstract" = "Abstract",
-         "title" = "Title",
-         "author_keyword" = "Author.Keywords",
-      "cited" = "Times.Cited,.All.Databases",
-        "type" = "Document.Type") %>%
-  mutate(source_main = "Web of Science")
-
-df2$authors <- df2$authors %>% 
-  str_to_upper(df2$authors)   #uppercase
-
-
-
-
-df4 <- science_raw %>%
-  select("Publication.Year", "Title", "Author", "Abstract.Note", "Item.Type", "Manual.Tags") %>% 
-  dplyr::rename( "year" = "Publication.Year",
-                 "authors" = "Author",
-                 "title" = "Title",
-                 "abstract" = "Abstract.Note",
-                 "type" = "Item.Type",
-                 "author_keyword" = "Manual.Tags") %>% 
-    mutate(source_main = "Science Direct")
-
-df4$authors <- df4$authors %>% 
-  str_to_upper(df4$authors)
-
-splits <- str_split_fixed(df4$authors, ",", 2)            #split authors into two columns
-df4$authors <- paste(splits[,2], splits[,1], sep = ' ')   #merge two columns other way round
-df4$authors <- gsub("[[:punct:][:blank:]]+", " ", df4$authors)
-
-df4$authors <- sapply(strsplit(as.character(df4$authors), "\\s+"),
-  function(x) paste(paste(substr(x[-length(x)], 1, 1), collapse=""), 
-      x[length(x)]))
-df4$authors <- sub("(\\w+),\\s(\\w+)","\\2 \\1", df4$authors)
-
-df4$authors <- sapply(strsplit(df4$authors, split=" "),function(x) 
-  {paste(rev(x),collapse=" ")})
+# science_raw = read.xlsx("C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Raw_data\\Science_direct\\ScienceDirect2.xlsx", "ScienceDirect1")
+# 
+# web_raw = read.xlsx("C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Raw_data\\web_of_science.xlsx", "1")
+# 
+# names(scopus_raw2)
+# 
+# #selection specifics
+# 
+# df1 <- scopus_raw2 %>% 
+#   select("ï..Authors", "Year", "Abstract", "Title", "Author.Keywords", "Cited.by", "Document.Type") %>% 
+#   dplyr::rename("authors" = "ï..Authors",
+#                 "year" = "Year",
+#                 "abstract" = "Abstract",
+#                 "title" = "Title",
+#                 "author_keyword" = "Author.Keywords",
+#                 "cited" = "Cited.by",
+#                 "type" = "Document.Type") %>% 
+#   mutate(source_main = "Scopus") 
+# 
+# setDT(df1)[, paste0("authors", 1:72) := tstrsplit(authors, ",")]
+# 
+# df1 <- within(df1, rm(authors))
+# 
+# df1 <- df1 %>%  
+#   dplyr::rename(authors = authors1)
+# 
+# df1$authors <- gsub(".", "", df1$authors, fixed=TRUE)
+# 
+# df1$authors <- df1$authors %>%
+#                  str_to_upper()
+# df1 <- df1 %>%
+#           select("authors", "year", "title", "author_keyword", "cited", "type", "source_main", "abstract")
+# 
+# 
+# 
+# 
+# df2 <- web_raw %>% 
+#   select("Keyword", "Authors", "Year", "Abstract", "Title", "Authors", "Author.Keywords", "Times.Cited,.All.Databases",     "Document.Type") %>% 
+# dplyr::rename("keyword" = "Keyword",
+#          "authors" = "Authors",
+#          "year" = "Year",
+#          "abstract" = "Abstract",
+#          "title" = "Title",
+#          "author_keyword" = "Author.Keywords",
+#       "cited" = "Times.Cited,.All.Databases",
+#         "type" = "Document.Type") %>%
+#   mutate(source_main = "Web of Science")
+# 
+# df2$authors <- df2$authors %>% 
+#   str_to_upper(df2$authors)   #uppercase
+# 
 
 
- 
 
-df12 <- df1 %>%                    
-  full_join(df2)
+# df4 <- science_raw %>%
+#   select("Publication.Year", "Title", "Author", "Abstract.Note", "Item.Type", "Manual.Tags") %>% 
+#   dplyr::rename( "year" = "Publication.Year",
+#                  "authors" = "Author",
+#                  "title" = "Title",
+#                  "abstract" = "Abstract.Note",
+#                  "type" = "Item.Type",
+#                  "author_keyword" = "Manual.Tags") %>% 
+#     mutate(source_main = "Science Direct")
+# 
+# df4$authors <- df4$authors %>% 
+#   str_to_upper(df4$authors)
+# 
+# splits <- str_split_fixed(df4$authors, ",", 2)            #split authors into two columns
+# df4$authors <- paste(splits[,2], splits[,1], sep = ' ')   #merge two columns other way round
+# df4$authors <- gsub("[[:punct:][:blank:]]+", " ", df4$authors)
+# 
+# df4$authors <- sapply(strsplit(as.character(df4$authors), "\\s+"),
+#   function(x) paste(paste(substr(x[-length(x)], 1, 1), collapse=""), 
+#       x[length(x)]))
+# df4$authors <- sub("(\\w+),\\s(\\w+)","\\2 \\1", df4$authors)
+# 
+# df4$authors <- sapply(strsplit(df4$authors, split=" "),function(x) 
+#   {paste(rev(x),collapse=" ")})
+# 
+# 
+#  
+# 
+# df12 <- df1 %>%                    
+#   full_join(df2)
+# 
+# df <- df12 %>%                         
+#   full_join(df4)
+# 
+# df$authors <- gsub("[[:punct:][:blank:]]+", " ", df$authors)
+# 
+# write.csv(df, "C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\systematic_review\\data\\litrev.csv")
+# 
+# 
+# df[!duplicated(df[,c("source_main")]),]
+# df[!duplicated(df[,c("keyword")]),]
+# df[!duplicated(df[,c("authors")]),]
+# df[!duplicated(df[,c("year")]),]
 
-df <- df12 %>%                         
-  full_join(df4)
 
-df$authors <- gsub("[[:punct:][:blank:]]+", " ", df$authors)
-
-write.csv(df, "C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\systematic_review\\data\\litrev.csv")
-
-
-df[!duplicated(df[,c("source_main")]),]
-df[!duplicated(df[,c("keyword")]),]
-df[!duplicated(df[,c("authors")]),]
-df[!duplicated(df[,c("year")]),]
-
+df <- read.csv("data/litrev.csv")
 
 ```
 
@@ -238,7 +240,6 @@ df_a <- df_a[!is.na(df_a$abs), ]
 df_a <- within(df_a, rm(title, authors, abstract))
     
 write.csv(df_a, "C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_rev\\systematic_review\\data\\litrev_df_a.csv")
-
 ```
 
 
@@ -246,6 +247,7 @@ write.csv(df_a, "C:\\Users\\2010088819\\Documents\\R Projects\\lit_rev\\Sys_lit_
 all databases included
 
 ```{r}
+df_a <- read_csv("data/litrev_df_a.csv")
 
 
 df_words <- df_a %>% 
@@ -274,6 +276,12 @@ freq <- df_words %>%
 
 print(freq)
 
+freq %>% 
+  na.omit()
+
+
+library(wordcloud)
+library(RColorBrewer)
 ```
 
 
