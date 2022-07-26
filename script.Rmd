@@ -300,21 +300,48 @@ freq_2 <- freq %>% filter(n > 20)
 dev.new(width = 50, height = 50, unit = "px")
 
 require(devtools)
-install.packages("Rtools")
-install_version("htmlwidgets", version = "1.5.4", repos = "http://cran.us.r-project.org")
+#install.packages("Rtools")
+#install_version("htmlwidgets", version = "1.5.4", repos = "http://cran.us.r-project.org")
 
-library(htmlwidgets)
+#library(htmlwidgets)
 
-(mywordcloud, file="mywordcloud.html")
-
-wordcloud2(freq, size = 2, gridSize = 0.5)
+#(mywordcloud, file="mywordcloud.html")
 set.seed(1234)
-htmltools::html_print(wordcloud(freq_2$auth_key, freq_2$n, use.r.layout = TRUE, scale = c(1,0.5),
+wordcloud2(freq_2, size = 0.6, minSize = 2)
+
+#set.seed(1234)
+#htmltools::html_print(wordcloud(freq_2$auth_key, freq_2$n, use.r.layout = TRUE, scale = c(1,0.5),
           rot.per = 0.40,
           colors=brewer.pal(8, "Dark2")))
 
-mypath <- htmltools::html_print(sassp_keywords)
-print(mypath)
+#mypath <- htmltools::html_print(sassp_keywords)
+#print(mypath)
+
+
+if(require(shiny)){
+  library(wordcloud2)
+   # Global variables can go here
+   n <- 1
+
+   # Define the UI
+   ui <- bootstrapPage(
+     numericInput('size', 'Size of wordcloud', n),
+     wordcloud2Output('wordcloud2')
+   )
+
+
+   # Define the server code
+   server <- function(input, output) {
+      output$wordcloud2 <- renderWordcloud2({
+      # wordcloud2(demoFreqC, size=input$size)
+        wordcloud2(freq_2, size=0.3)
+      })
+   }
+   # Return a Shiny app object
+   # Sys.setlocale("LC_CTYPE","chs") #if you use Chinese character
+   ## Do not Run!
+   shinyApp(ui = ui, server = server)
+   }
 ```
 
 
