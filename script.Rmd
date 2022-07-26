@@ -31,7 +31,7 @@ library(htmlwidgets)          #save wordcloud
 library(htmlTable)
 
 library(Hmisc)                #describe
-7
+
 library(cld3)                 #detect and translate
 
 library(stringr)              #sentence case, split en ruil om initials and surname
@@ -279,13 +279,42 @@ print(freq)
 freq %>% 
   na.omit()
 
+#install.packages("wordcloud2")
+library(wordcloud2)
 library(wordcloud)
 library(RColorBrewer)
 ```
 
 #SASPP word cloud 
 ```{r}
+freq$auth_key <- as.character(freq$auth_key)
 
+#wordcloud2(data=freq %>% filter(n > 20), size=2, color='random-dark')
+
+require(Rcpp)
+
+freq[1, 1] = "S. sclerotiorum"
+
+freq_2 <- freq %>% filter(n > 20)
+
+dev.new(width = 50, height = 50, unit = "px")
+
+require(devtools)
+install.packages("Rtools")
+install_version("htmlwidgets", version = "1.5.4", repos = "http://cran.us.r-project.org")
+
+library(htmlwidgets)
+
+(mywordcloud, file="mywordcloud.html")
+
+wordcloud2(freq, size = 2, gridSize = 0.5)
+set.seed(1234)
+htmltools::html_print(wordcloud(freq_2$auth_key, freq_2$n, use.r.layout = TRUE, scale = c(1,0.5),
+          rot.per = 0.40,
+          colors=brewer.pal(8, "Dark2")))
+
+mypath <- htmltools::html_print(sassp_keywords)
+print(mypath)
 ```
 
 
