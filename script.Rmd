@@ -297,9 +297,9 @@ freq[1, 1] = "S. sclerotiorum"
 
 freq_2 <- freq %>% filter(n > 20)
 
-dev.new(width = 50, height = 50, unit = "px")
+dev.new(width = 1000, height = 1000, unit = "px")
 
-require(devtools)
+#require(devtools)
 #install.packages("Rtools")
 #install_version("htmlwidgets", version = "1.5.4", repos = "http://cran.us.r-project.org")
 
@@ -307,8 +307,11 @@ require(devtools)
 
 #(mywordcloud, file="mywordcloud.html")
 set.seed(1234)
-wordcloud2(freq_2, size = 0.6, minSize = 2)
+mycloud = wordcloud2(freq_2, size = 1, minSize = 0.5)
+```
 
+
+```{r}
 #set.seed(1234)
 #htmltools::html_print(wordcloud(freq_2$auth_key, freq_2$n, use.r.layout = TRUE, scale = c(1,0.5),
           rot.per = 0.40,
@@ -342,6 +345,15 @@ if(require(shiny)){
    ## Do not Run!
    shinyApp(ui = ui, server = server)
    }
+
+library(webshot)
+webshot::install_phantomjs(force = T)
+
+# save it in html
+library("htmlwidgets")
+saveWidget(mycloud,"tmp.html",selfcontained = T)
+
+webshot("tmp.html","fig_1.pdf", delay =5, vwidth = 480, vheight=480)
 ```
 
 
