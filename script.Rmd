@@ -172,7 +172,6 @@ df <- read.csv("data/litrev.csv")
 ```
 
 
-
 # describe
 detect missing data
 
@@ -1648,3 +1647,10 @@ citation(package = "officer")
 citation(package = "wesanderson")
 
 ```
+
+
+```{r}
+df %>% 
+  filter()
+```
+
